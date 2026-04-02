@@ -58,7 +58,7 @@ def generate_questions(intent):
             ("2. Industry", "What is your field/industry?", "e.g. IT, Mechanical"),
             ("3. Target Role", "What role are you targeting?", "e.g. Software Engineer"),
             ("4. Background", "Education / projects / experience?", "e.g. B.Tech + ML project"),
-            ("5. Skills", "Key skills?", "e.g. Python, SQL, Communication"),
+            ("4. Skills", "Key skills?", "e.g. Python, SQL, Communication"),
             ("6. Style", "Resume style?", "ATS-friendly or creative"),
             ("7. Output", "1-page or 2-page?", "e.g. 1-page concise"),
             ("8. Tone", "Tone?", "Formal / Professional")
@@ -150,22 +150,26 @@ Answer a few questions to generate a powerful prompt 👇
                 for key, value in answers.items():
                     prompt_input += f"{key}: {value}\n"
 
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are PromptForge AI. Generate 4 high-quality prompts in Creative, Analytical, Minimal, and Expert styles."
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt_input
-                        }
-                    ],
-                    temperature=0.7
-                )
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "You are PromptForge AI. Generate 4 high-quality prompts in Creative, Analytical, Minimal, and Expert styles."
+                            },
+                            {
+                                "role": "user",
+                                "content": prompt_input
+                            }
+                        ],
+                        temperature=0.7
+                    )
 
-                output = response.choices[0].message.content
+                    output = response.choices[0].message.content
+
+                except Exception as e:
+                    output = "⚠️ Error: API limit reached or issue occurred. Please try again later."
 
             st.markdown("### 🔥 Generated Prompts")
             st.code(output)
