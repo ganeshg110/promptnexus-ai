@@ -276,7 +276,10 @@ h1 {
 # -------------------------------
 # 📌 SIDEBAR
 # -------------------------------
-st.sidebar.title("⚡ PromptForge AI")
+st.sidebar.markdown("""
+<h2 style='margin-bottom:0;'>⚡ PromptForge AI</h2>
+<p style='color:#6b7280; font-size:11px; margin-top:0;'>By Ganesh Goddilla</p>
+""", unsafe_allow_html=True)
 
 page = st.sidebar.radio(
     "Navigation",
