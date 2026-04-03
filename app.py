@@ -223,6 +223,247 @@
 
 
 
+# import streamlit as st
+
+# # -------------------------------
+# # 💾 SESSION HISTORY
+# # -------------------------------
+# if "history" not in st.session_state:
+#     st.session_state.history = []
+
+# # -------------------------------
+# # 🔧 PAGE CONFIG
+# # -------------------------------
+# st.set_page_config(page_title="PromptForge AI", page_icon="⚡", layout="centered")
+
+# # -------------------------------
+# # 🎨 PREMIUM STYLING
+# # -------------------------------
+# st.markdown("""
+# <style>
+# body {
+#     background-color: #0e1117;
+# }
+# .main {
+#     background: linear-gradient(180deg, #0e1117 0%, #111827 100%);
+# }
+# h1 {
+#     font-size: 42px;
+#     font-weight: 700;
+#     text-align: center;
+# }
+# .subtext {
+#     text-align: center;
+#     color: #9ca3af;
+#     margin-bottom: 20px;
+# }
+# .card {
+#     background: #1f2937;
+#     padding: 15px;
+#     border-radius: 12px;
+#     margin-bottom: 10px;
+# }
+# .stButton>button {
+#     background: linear-gradient(90deg, #4CAF50, #22c55e);
+#     color: white;
+#     border-radius: 12px;
+#     height: 45px;
+#     font-size: 16px;
+# }
+# </style>
+# """, unsafe_allow_html=True)
+
+# # -------------------------------
+# # 📌 SIDEBAR
+# # -------------------------------
+# st.sidebar.markdown("""
+# <h2 style='margin-bottom:0;'>⚡ PromptForge AI</h2>
+# <p style='color:#6b7280; font-size:11px; margin-top:0;'>By Ganesh Goddilla</p>
+# """, unsafe_allow_html=True)
+
+# page = st.sidebar.radio(
+#     "Navigation",
+#     ["🏠 Home", "📜 History", "ℹ️ About"]
+# )
+
+# # -------------------------------
+# # 🧠 FUNCTION: DYNAMIC QUESTIONS
+# # -------------------------------
+# def generate_questions(intent):
+
+#     if "resume" in intent:
+#         return [
+#             ("Role", "Target job role?", "Software Engineer"),
+#             ("Experience", "Experience level?", "Fresher"),
+#             ("Skills", "Key skills?", "Python, SQL"),
+#             ("Education", "Education?", "B.Tech"),
+#         ]
+
+#     elif "image" in intent:
+#         return [
+#             ("Type", "Image type?", "realistic"),
+#             ("Subject", "Main subject?", "robot"),
+#             ("Style", "Style?", "cinematic"),
+#             ("Mood", "Mood?", "dark"),
+#         ]
+
+#     elif "youtube" in intent:
+#         return [
+#             ("Topic", "Video topic?", "AI tools"),
+#             ("Audience", "Audience?", "students"),
+#             ("Length", "Length?", "short"),
+#             ("Tone", "Tone?", "fun"),
+#         ]
+
+#     else:
+#         return [
+#             ("Goal", "What do you want?", "startup idea"),
+#             ("Context", "Topic?", "AI"),
+#             ("Audience", "Target?", "developers"),
+#             ("Tone", "Tone?", "professional"),
+#         ]
+
+# # -------------------------------
+# # 🧠 SMART PROMPT ENGINE
+# # -------------------------------
+# def generate_prompts(user_input, answers):
+
+#     intent = user_input.lower()
+
+#     # 🔥 IMAGE LOGIC (SMART)
+#     if "image" in intent:
+
+#         subject = answers.get("Subject", "")
+#         style = answers.get("Style", "")
+#         mood = answers.get("Mood", "")
+#         type_ = answers.get("Type", "")
+
+#         base = f"{type_} {style} {mood} {subject}".strip()
+
+#         creative = f"""
+# 🔹 Prompt 1 – Creative Style  
+# Create a highly detailed {type_} image of {subject} in a {style} style with a {mood} mood.  
+# Include cinematic lighting, rich textures, and dynamic composition.  
+# Make it visually stunning and unique.
+# """
+
+#         analytical = f"""
+# 🔹 Prompt 2 – Analytical Style  
+# Generate an image with the following structured details:
+# - Subject: {subject}
+# - Style: {style}
+# - Mood: {mood}
+# - Type: {type_}
+
+# Ensure clarity, proper composition, and balanced visual elements.
+# """
+
+#         minimal = f"""
+# 🔹 Prompt 3 – Minimal Style  
+# {base}, high quality, detailed
+# """
+
+#         expert = f"""
+# 🔹 Prompt 4 – Expert-Level Style  
+# Create a {type_} {style} image of {subject} with a {mood} atmosphere.  
+# Use professional photography techniques, depth of field, realistic lighting, and high-resolution detail (4K/8K).  
+# Focus on composition, shadows, and cinematic realism.
+# """
+
+#         return creative + analytical + minimal + expert
+
+#     # 🔥 DEFAULT LOGIC (OTHER USE CASES)
+#     base = f"Task: {user_input}\n"
+#     for k, v in answers.items():
+#         base += f"- {k}: {v}\n"
+
+#     return f"""
+# 🔹 Prompt 1 – Creative  
+# Act as a creative expert and generate output for:
+
+# {base}
+
+# 🔹 Prompt 2 – Analytical  
+# Break this down step-by-step:
+
+# {base}
+
+# 🔹 Prompt 3 – Minimal  
+# Create a short prompt for: {user_input}
+
+# 🔹 Prompt 4 – Expert  
+# Act as an industry expert and generate a high-quality prompt:
+
+# {base}
+# """
+
+# # =========================================================
+# # 🏠 HOME
+# # =========================================================
+# if page == "🏠 Home":
+
+#     st.markdown("<h1>⚡ PromptForge AI</h1>", unsafe_allow_html=True)
+#     st.markdown('<p class="subtext">Generate powerful prompts like a pro 🚀</p>', unsafe_allow_html=True)
+
+#     st.markdown("""
+# <div class="card">
+# ✨ Create prompts for Resume, YouTube, Images, Startups & more  
+# ⚡ 100% Free  
+# 🧠 Smart guided system  
+# </div>
+# """, unsafe_allow_html=True)
+
+#     user_input = st.text_input("What do you want to create?", placeholder="e.g. image, resume, youtube...")
+
+#     if user_input:
+
+#         questions = generate_questions(user_input.lower())
+#         answers = {}
+
+#         st.markdown("### ⚙️ Customize your prompt")
+
+#         for title, question, example in questions:
+#             answers[title] = st.text_input(question, placeholder=example)
+
+#         if st.button("🚀 Generate Prompts"):
+
+#             output = generate_prompts(user_input, answers)
+
+#             st.markdown("### 🔥 Your Prompts")
+#             st.code(output)
+
+#             st.session_state.history.append(output)
+
+# # =========================================================
+# # 📜 HISTORY
+# # =========================================================
+# elif page == "📜 History":
+
+#     st.markdown("## 📜 Prompt History")
+
+#     if st.session_state.history:
+#         for item in st.session_state.history[::-1]:
+#             st.code(item)
+#     else:
+#         st.info("No prompts yet.")
+
+# # =========================================================
+# # ℹ️ ABOUT
+# # =========================================================
+# else:
+
+#     st.markdown("## ℹ️ About")
+
+#     st.write("""
+# PromptForge AI is a smart prompt generator.
+# Created By GANESH GODDILLA
+
+# 🚀 Built for creators, developers, and entrepreneurs  
+# ⚡ 100% Free version  
+# 💡 Upgrade to AI-powered version anytime  
+# """)
+
+
 import streamlit as st
 
 # -------------------------------
@@ -237,7 +478,7 @@ if "history" not in st.session_state:
 st.set_page_config(page_title="PromptForge AI", page_icon="⚡", layout="centered")
 
 # -------------------------------
-# 🎨 PREMIUM STYLING
+# 🎨 STYLING
 # -------------------------------
 st.markdown("""
 <style>
@@ -249,26 +490,16 @@ body {
 }
 h1 {
     font-size: 42px;
-    font-weight: 700;
     text-align: center;
 }
 .subtext {
     text-align: center;
     color: #9ca3af;
-    margin-bottom: 20px;
-}
-.card {
-    background: #1f2937;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
 }
 .stButton>button {
     background: linear-gradient(90deg, #4CAF50, #22c55e);
     color: white;
-    border-radius: 12px;
-    height: 45px;
-    font-size: 16px;
+    border-radius: 10px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -281,25 +512,14 @@ st.sidebar.markdown("""
 <p style='color:#6b7280; font-size:11px; margin-top:0;'>By Ganesh Goddilla</p>
 """, unsafe_allow_html=True)
 
-page = st.sidebar.radio(
-    "Navigation",
-    ["🏠 Home", "📜 History", "ℹ️ About"]
-)
+page = st.sidebar.radio("Navigation", ["🏠 Home", "📜 History", "ℹ️ About"])
 
 # -------------------------------
-# 🧠 FUNCTION: DYNAMIC QUESTIONS
+# 🧠 QUESTIONS
 # -------------------------------
 def generate_questions(intent):
 
-    if "resume" in intent:
-        return [
-            ("Role", "Target job role?", "Software Engineer"),
-            ("Experience", "Experience level?", "Fresher"),
-            ("Skills", "Key skills?", "Python, SQL"),
-            ("Education", "Education?", "B.Tech"),
-        ]
-
-    elif "image" in intent:
+    if "image" in intent:
         return [
             ("Type", "Image type?", "realistic"),
             ("Subject", "Main subject?", "robot"),
@@ -315,87 +535,82 @@ def generate_questions(intent):
             ("Tone", "Tone?", "fun"),
         ]
 
+    elif "resume" in intent:
+        return [
+            ("Role", "Target role?", "Software Engineer"),
+            ("Experience", "Experience?", "Fresher"),
+            ("Skills", "Skills?", "Python, SQL"),
+        ]
+
     else:
         return [
-            ("Goal", "What do you want?", "startup idea"),
-            ("Context", "Topic?", "AI"),
-            ("Audience", "Target?", "developers"),
+            ("Goal", "Goal?", "startup idea"),
+            ("Context", "Context?", "AI"),
+            ("Audience", "Audience?", "developers"),
             ("Tone", "Tone?", "professional"),
         ]
 
 # -------------------------------
-# 🧠 SMART PROMPT ENGINE
+# 🧠 DYNAMIC EXAMPLES
+# -------------------------------
+def get_examples(intent, field):
+
+    intent = intent.lower()
+    field = field.lower()
+
+    if "image" in intent:
+        return {
+            "type": ["realistic", "cartoon", "3D", "illustration"],
+            "subject": ["robot", "astronaut", "lion", "product"],
+            "style": ["cinematic", "anime", "photorealistic", "cyberpunk"],
+            "mood": ["dark", "vibrant", "futuristic", "dreamy"],
+        }.get(field, [])
+
+    elif "youtube" in intent:
+        return {
+            "topic": ["AI tools", "motivation", "finance"],
+            "audience": ["students", "beginners", "developers"],
+            "length": ["short", "long"],
+            "tone": ["fun", "educational", "serious"],
+        }.get(field, [])
+
+    elif "resume" in intent:
+        return {
+            "role": ["Software Engineer", "Data Analyst", "HR"],
+            "experience": ["Fresher", "1 year", "3+ years"],
+            "skills": ["Python, SQL", "Excel, Power BI"],
+        }.get(field, [])
+
+    return []
+
+# -------------------------------
+# 🧠 PROMPT ENGINE
 # -------------------------------
 def generate_prompts(user_input, answers):
 
-    intent = user_input.lower()
-
-    # 🔥 IMAGE LOGIC (SMART)
-    if "image" in intent:
+    if "image" in user_input.lower():
 
         subject = answers.get("Subject", "")
         style = answers.get("Style", "")
         mood = answers.get("Mood", "")
         type_ = answers.get("Type", "")
 
-        base = f"{type_} {style} {mood} {subject}".strip()
-
-        creative = f"""
-🔹 Prompt 1 – Creative Style  
-Create a highly detailed {type_} image of {subject} in a {style} style with a {mood} mood.  
-Include cinematic lighting, rich textures, and dynamic composition.  
-Make it visually stunning and unique.
-"""
-
-        analytical = f"""
-🔹 Prompt 2 – Analytical Style  
-Generate an image with the following structured details:
-- Subject: {subject}
-- Style: {style}
-- Mood: {mood}
-- Type: {type_}
-
-Ensure clarity, proper composition, and balanced visual elements.
-"""
-
-        minimal = f"""
-🔹 Prompt 3 – Minimal Style  
-{base}, high quality, detailed
-"""
-
-        expert = f"""
-🔹 Prompt 4 – Expert-Level Style  
-Create a {type_} {style} image of {subject} with a {mood} atmosphere.  
-Use professional photography techniques, depth of field, realistic lighting, and high-resolution detail (4K/8K).  
-Focus on composition, shadows, and cinematic realism.
-"""
-
-        return creative + analytical + minimal + expert
-
-    # 🔥 DEFAULT LOGIC (OTHER USE CASES)
-    base = f"Task: {user_input}\n"
-    for k, v in answers.items():
-        base += f"- {k}: {v}\n"
-
-    return f"""
+        return f"""
 🔹 Prompt 1 – Creative  
-Act as a creative expert and generate output for:
-
-{base}
+Create a highly detailed {type_} image of {subject} in a {style} style with a {mood} mood.
 
 🔹 Prompt 2 – Analytical  
-Break this down step-by-step:
-
-{base}
+Subject: {subject}, Style: {style}, Mood: {mood}, Type: {type_}
 
 🔹 Prompt 3 – Minimal  
-Create a short prompt for: {user_input}
+{type_} {style} {mood} {subject}, high quality
 
 🔹 Prompt 4 – Expert  
-Act as an industry expert and generate a high-quality prompt:
-
-{base}
+Professional {type_} {style} image of {subject}, cinematic lighting, ultra realistic.
 """
+
+    # default
+    return f"Generate prompts for {user_input}"
 
 # =========================================================
 # 🏠 HOME
@@ -403,17 +618,9 @@ Act as an industry expert and generate a high-quality prompt:
 if page == "🏠 Home":
 
     st.markdown("<h1>⚡ PromptForge AI</h1>", unsafe_allow_html=True)
-    st.markdown('<p class="subtext">Generate powerful prompts like a pro 🚀</p>', unsafe_allow_html=True)
+    st.markdown('<p class="subtext">Generate prompts like a pro 🚀</p>', unsafe_allow_html=True)
 
-    st.markdown("""
-<div class="card">
-✨ Create prompts for Resume, YouTube, Images, Startups & more  
-⚡ 100% Free  
-🧠 Smart guided system  
-</div>
-""", unsafe_allow_html=True)
-
-    user_input = st.text_input("What do you want to create?", placeholder="e.g. image, resume, youtube...")
+    user_input = st.text_input("What do you want to create?")
 
     if user_input:
 
@@ -423,13 +630,34 @@ if page == "🏠 Home":
         st.markdown("### ⚙️ Customize your prompt")
 
         for title, question, example in questions:
-            answers[title] = st.text_input(question, placeholder=example)
 
+            key = f"{title}_{user_input}"
+
+            # input
+            answers[title] = st.text_input(
+                question,
+                placeholder=example,
+                key=key
+            )
+
+            # examples
+            examples = get_examples(user_input, title)
+
+            if examples:
+                cols = st.columns(len(examples))
+
+                for i, ex in enumerate(examples):
+                    with cols[i]:
+                        if st.button(ex, key=f"{key}_{ex}"):
+                            st.session_state[key] = ex
+                            st.rerun()
+
+        # generate
         if st.button("🚀 Generate Prompts"):
 
             output = generate_prompts(user_input, answers)
 
-            st.markdown("### 🔥 Your Prompts")
+            st.markdown("### 🔥 Output")
             st.code(output)
 
             st.session_state.history.append(output)
@@ -439,26 +667,12 @@ if page == "🏠 Home":
 # =========================================================
 elif page == "📜 History":
 
-    st.markdown("## 📜 Prompt History")
-
-    if st.session_state.history:
-        for item in st.session_state.history[::-1]:
-            st.code(item)
-    else:
-        st.info("No prompts yet.")
+    for item in st.session_state.history[::-1]:
+        st.code(item)
 
 # =========================================================
 # ℹ️ ABOUT
 # =========================================================
 else:
 
-    st.markdown("## ℹ️ About")
-
-    st.write("""
-PromptForge AI is a smart prompt generator.
-Created By GANESH GODDILLA
-
-🚀 Built for creators, developers, and entrepreneurs  
-⚡ 100% Free version  
-💡 Upgrade to AI-powered version anytime  
-""")
+    st.write("PromptForge AI - Free prompt generator 🚀")
