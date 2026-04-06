@@ -2010,7 +2010,597 @@
 
 
 
+# import streamlit as st
+
+# # -------------------------------
+# # PAGE CONFIG
+# # -------------------------------
+# st.set_page_config(
+#     page_title="PromptNexus AI",
+#     page_icon="🧠",
+#     layout="wide",
+#     initial_sidebar_state="expanded"
+# )
+
+# # -------------------------------
+# # SESSION STATE
+# # -------------------------------
+# if "generated_prompt" not in st.session_state:
+#     st.session_state.generated_prompt = ""
+
+# # -------------------------------
+# # CUSTOM CSS
+# # -------------------------------
+# st.markdown("""
+# <style>
+# html, body, [class*="css"] {
+#     font-family: 'Inter', sans-serif;
+# }
+
+# .stApp {
+#     background: linear-gradient(135deg, #0B0F19 0%, #111827 40%, #0F172A 100%);
+#     color: white;
+# }
+
+# section[data-testid="stSidebar"] {
+#     background: linear-gradient(180deg, #0F172A 0%, #111827 100%);
+#     border-right: 1px solid rgba(255,255,255,0.08);
+# }
+
+# .sidebar-logo {
+#     padding: 14px 10px 18px 10px;
+#     border-radius: 18px;
+#     background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(0,212,255,0.10));
+#     border: 1px solid rgba(255,255,255,0.08);
+#     box-shadow: 0 0 18px rgba(108,99,255,0.18);
+#     margin-bottom: 18px;
+# }
+
+# .logo-title {
+#     font-size: 28px;
+#     font-weight: 800;
+#     line-height: 1.1;
+#     background: linear-gradient(90deg, #6C63FF, #00D4FF, #A855F7);
+#     -webkit-background-clip: text;
+#     -webkit-text-fill-color: transparent;
+# }
+
+# .logo-subtitle {
+#     color: #9CA3AF;
+#     font-size: 13px;
+#     margin-top: 6px;
+# }
+
+# .hero-card {
+#     padding: 28px;
+#     border-radius: 24px;
+#     background: linear-gradient(135deg, rgba(17,24,39,0.92), rgba(15,23,42,0.92));
+#     border: 1px solid rgba(255,255,255,0.08);
+#     box-shadow: 0 0 30px rgba(0,212,255,0.08), 0 0 50px rgba(108,99,255,0.08);
+#     margin-bottom: 22px;
+# }
+
+# .hero-title {
+#     font-size: 42px;
+#     font-weight: 800;
+#     margin-bottom: 10px;
+#     background: linear-gradient(90deg, #FFFFFF, #00D4FF, #A855F7);
+#     -webkit-background-clip: text;
+#     -webkit-text-fill-color: transparent;
+# }
+
+# .hero-desc {
+#     color: #cbd5e1;
+#     font-size: 16px;
+#     line-height: 1.6;
+# }
+
+# .feature-card {
+#     background: rgba(17,24,39,0.85);
+#     border: 1px solid rgba(255,255,255,0.07);
+#     border-radius: 20px;
+#     padding: 18px;
+#     margin-bottom: 16px;
+#     box-shadow: 0 0 20px rgba(0,0,0,0.18);
+# }
+
+# .feature-title {
+#     font-size: 20px;
+#     font-weight: 700;
+#     margin-bottom: 10px;
+#     color: #E5E7EB;
+# }
+
+# .feature-text {
+#     color: #9CA3AF;
+#     line-height: 1.7;
+#     font-size: 15px;
+# }
+
+# .prompt-box {
+#     background: linear-gradient(135deg, rgba(17,24,39,0.98), rgba(30,41,59,0.98));
+#     border: 1px solid rgba(0,212,255,0.22);
+#     border-radius: 22px;
+#     padding: 24px;
+#     box-shadow: 0 0 25px rgba(0,212,255,0.10), 0 0 35px rgba(168,85,247,0.10);
+#     margin-top: 18px;
+#     white-space: pre-wrap;
+#     line-height: 1.75;
+#     font-size: 16px;
+#     color: #F8FAFC;
+# }
+
+# .prompt-heading {
+#     font-size: 24px;
+#     font-weight: 800;
+#     margin-bottom: 14px;
+#     color: #FFFFFF;
+# }
+
+# label, .stSelectbox label, .stTextInput label, .stTextArea label {
+#     color: #E5E7EB !important;
+#     font-weight: 600 !important;
+# }
+
+# .stButton > button {
+#     width: 100%;
+#     border-radius: 16px;
+#     border: none;
+#     padding: 0.75rem 1rem;
+#     font-weight: 700;
+#     font-size: 15px;
+#     color: white;
+#     background: linear-gradient(90deg, #6C63FF, #00D4FF);
+#     box-shadow: 0 0 18px rgba(0,212,255,0.25);
+#     transition: all 0.25s ease-in-out;
+# }
+
+# .stButton > button:hover {
+#     transform: translateY(-2px);
+#     box-shadow: 0 0 24px rgba(108,99,255,0.35);
+# }
+
+# .stTextArea textarea,
+# .stTextInput input {
+#     background: rgba(17,24,39,0.95) !important;
+#     color: white !important;
+#     border-radius: 14px !important;
+#     border: 1px solid rgba(255,255,255,0.08) !important;
+# }
+
+# .stSelectbox div[data-baseweb="select"] > div {
+#     background: rgba(17,24,39,0.95) !important;
+#     border-radius: 14px !important;
+#     border: 1px solid rgba(255,255,255,0.08) !important;
+# }
+
+# .section-title {
+#     font-size: 26px;
+#     font-weight: 800;
+#     margin-top: 12px;
+#     margin-bottom: 14px;
+#     color: #F8FAFC;
+# }
+
+# .badge {
+#     display: inline-block;
+#     padding: 6px 12px;
+#     border-radius: 999px;
+#     background: rgba(108,99,255,0.16);
+#     color: #dbeafe;
+#     border: 1px solid rgba(255,255,255,0.08);
+#     font-size: 13px;
+#     margin-bottom: 10px;
+# }
+
+# .example-box {
+#     background: rgba(17,24,39,0.72);
+#     border: 1px solid rgba(255,255,255,0.06);
+#     border-radius: 16px;
+#     padding: 14px 16px;
+#     margin-top: 8px;
+#     margin-bottom: 10px;
+#     color: #cbd5e1;
+#     font-size: 14px;
+#     line-height: 1.7;
+# }
+
+# .small-note {
+#     color: #94A3B8;
+#     font-size: 13px;
+#     margin-top: -5px;
+#     margin-bottom: 12px;
+# }
+# </style>
+# """, unsafe_allow_html=True)
+
+# # -------------------------------
+# # USE CASE DATA
+# # -------------------------------
+# USE_CASE_CONFIG = {
+#     "Content Writing": {
+#         "topic_placeholder": "e.g. Write a blog post on AI tools for productivity",
+#         "audience_placeholder": "e.g. content creators, bloggers, marketers",
+#         "extra_placeholder": "Add tone, content length, SEO keywords, platform, CTA, and format needs.",
+#         "examples": [
+#             "Instagram caption for a fitness brand launch",
+#             "SEO blog post on beginner MLOps roadmap",
+#             "LinkedIn post about GenAI career transition"
+#         ]
+#     },
+#     "Coding": {
+#         "topic_placeholder": "e.g. Build a Python script for file organizer automation",
+#         "audience_placeholder": "e.g. Python developers, beginners, backend engineers",
+#         "extra_placeholder": "Mention language, framework, output format, best practices, edge cases, and constraints.",
+#         "examples": [
+#             "Streamlit app for AI prompt generator",
+#             "FastAPI REST API with authentication",
+#             "Python function to parse logs and summarize errors"
+#         ]
+#     },
+#     "Business": {
+#         "topic_placeholder": "e.g. Create a startup idea for AI resume review tool",
+#         "audience_placeholder": "e.g. startup founders, consultants, entrepreneurs",
+#         "extra_placeholder": "Mention industry, target market, budget, revenue model, and strategic goals.",
+#         "examples": [
+#             "Business plan for a faceless YouTube automation agency",
+#             "Pricing strategy for AI SaaS tool",
+#             "Go-to-market plan for student productivity app"
+#         ]
+#     },
+#     "Students": {
+#         "topic_placeholder": "e.g. Explain neural networks in simple terms",
+#         "audience_placeholder": "e.g. school students, college students, exam aspirants",
+#         "extra_placeholder": "Mention difficulty level, subject, exam type, explanation style, and examples needed.",
+#         "examples": [
+#             "Study notes for DBMS interview preparation",
+#             "Simple explanation of cloud computing",
+#             "5-mark answer for machine learning basics"
+#         ]
+#     },
+#     "General Use": {
+#         "topic_placeholder": "e.g. Write a professional email requesting project access",
+#         "audience_placeholder": "e.g. professionals, general users, freelancers",
+#         "extra_placeholder": "Mention tone, context, recipient, expected format, and any important details.",
+#         "examples": [
+#             "Professional apology email to manager",
+#             "Daily planner for a productive workday",
+#             "Checklist for moving to a new city"
+#         ]
+#     },
+#     "Marketing": {
+#         "topic_placeholder": "e.g. Create ad copy for eco-friendly water bottle",
+#         "audience_placeholder": "e.g. customers, marketers, D2C brands",
+#         "extra_placeholder": "Mention platform, product, brand voice, CTA, target market, and campaign goal.",
+#         "examples": [
+#             "Facebook ad copy for skincare product",
+#             "Email campaign for Black Friday sale",
+#             "Brand tagline ideas for AI startup"
+#         ]
+#     },
+#     "Resume / Career": {
+#         "topic_placeholder": "e.g. Rewrite my resume summary for MLOps engineer role",
+#         "audience_placeholder": "e.g. recruiters, hiring managers, job seekers",
+#         "extra_placeholder": "Mention target role, years of experience, industry, skills, and desired tone.",
+#         "examples": [
+#             "Resume bullet points for Python developer",
+#             "Cover letter for GenAI engineer role",
+#             "LinkedIn About section for fresher in MLOps"
+#         ]
+#     },
+#     "Startup Ideas": {
+#         "topic_placeholder": "e.g. Generate startup ideas using GenAI in education",
+#         "audience_placeholder": "e.g. founders, investors, builders",
+#         "extra_placeholder": "Mention niche, monetization preference, user pain points, and level of innovation.",
+#         "examples": [
+#             "Low-cost AI SaaS ideas for India",
+#             "B2B startup idea for internal documentation",
+#             "One-person startup ideas in automation"
+#         ]
+#     },
+#     "Social Media": {
+#         "topic_placeholder": "e.g. Create 10 reel ideas for AI productivity content",
+#         "audience_placeholder": "e.g. Instagram audience, creators, YouTube viewers",
+#         "extra_placeholder": "Mention platform, tone, niche, content length, hook style, and target audience.",
+#         "examples": [
+#             "YouTube Shorts script on AI tools",
+#             "Twitter thread on beginner coding mistakes",
+#             "Instagram carousel post on career growth"
+#         ]
+#     },
+#     "Email Writing": {
+#         "topic_placeholder": "e.g. Draft an email asking for project status update",
+#         "audience_placeholder": "e.g. manager, HR, client, colleague",
+#         "extra_placeholder": "Mention sender intent, recipient, tone, urgency, and required action.",
+#         "examples": [
+#             "Leave request email",
+#             "Follow-up email after interview",
+#             "Formal escalation email for blocked task"
+#         ]
+#     },
+#     "Image Generation": {
+#         "topic_placeholder": "e.g. Create a cinematic superhero portrait in space",
+#         "audience_placeholder": "e.g. Midjourney users, designers, creators",
+#         "extra_placeholder": "Mention art style, camera angle, lighting, composition, mood, colors, and quality.",
+#         "examples": [
+#             "Anime warrior in neon city at night",
+#             "Luxury product ad shot with soft lighting",
+#             "Marvel-style superhero poster in pastel space"
+#         ]
+#     },
+#     "YouTube Scripts": {
+#         "topic_placeholder": "e.g. Write a 60-second YouTube script on top AI tools",
+#         "audience_placeholder": "e.g. YouTube viewers, beginners, tech audience",
+#         "extra_placeholder": "Mention niche, duration, hook style, CTA, tone, and retention style.",
+#         "examples": [
+#             "60-second script for motivation reel",
+#             "Faceless finance video script",
+#             "Tech explainer script on ChatGPT vs OpenAI"
+#         ]
+#     }
+# }
+
+# # -------------------------------
+# # PROMPT GENERATOR LOGIC
+# # -------------------------------
+# def build_prompt(use_case, topic, style, audience, extra_details):
+#     style_map = {
+#         "Professional": "Write in a polished, structured, professional tone with clarity and strong intent.",
+#         "Creative": "Write in an imaginative, engaging, high-impact style with expressive language and originality.",
+#         "Minimal": "Write in a concise, sharp, clean style with no fluff and maximum clarity.",
+#         "Cinematic": "Write in a vivid, dramatic, immersive cinematic style with rich visual detail and emotional depth.",
+#         "Anime": "Write in a visually expressive anime-inspired style with strong mood, dynamic imagery, and stylized details.",
+#         "Realistic": "Write in a grounded, highly realistic style with precise details and practical clarity.",
+#         "Expert": "Write in an advanced expert-level style with authority, precision, structure, and strategic detail."
+#     }
+
+#     base_instruction = f"""
+# Act as an expert AI prompt engineer. Create a premium, highly effective prompt for the use case "{use_case}" focused on "{topic}".
+
+# The prompt should be designed for {audience.lower()} and should generate output that is useful, clear, professional, and context-aware. {style_map[style]}
+
+# The final prompt must:
+# - clearly define the AI's role
+# - describe the task with strong intent
+# - include the right tone and structure
+# - request detailed, high-quality output
+# - feel polished and ready for direct use in ChatGPT or any advanced AI tool
+
+# Additional requirements and context:
+# {extra_details if extra_details.strip() else "No extra constraints provided."}
+
+# Return only one strong, refined, professional paragraph prompt.
+# """
+
+#     use_case_addons = {
+#         "Content Writing": "Make the prompt optimized for strong writing quality, readability, audience engagement, and content structure.",
+#         "Coding": "Make the prompt optimized for clean code, correct logic, maintainability, explanations, and best practices.",
+#         "Business": "Make the prompt optimized for strategic thinking, actionable insights, market relevance, and practical recommendations.",
+#         "Students": "Make the prompt optimized for clear explanation, step-by-step teaching, easy understanding, and educational value.",
+#         "General Use": "Make the prompt optimized for flexibility, clarity, and practical usefulness.",
+#         "Marketing": "Make the prompt optimized for conversion, audience targeting, brand tone, persuasion, and campaign effectiveness.",
+#         "Resume / Career": "Make the prompt optimized for hiring impact, clarity, ATS-friendly quality, and professional career positioning.",
+#         "Startup Ideas": "Make the prompt optimized for innovation, business viability, target user pain points, and monetization potential.",
+#         "Social Media": "Make the prompt optimized for attention-grabbing hooks, engagement, clarity, and platform-specific performance.",
+#         "Email Writing": "Make the prompt optimized for professionalism, tone control, clarity, and actionable communication.",
+#         "Image Generation": "Make the prompt optimized for visual richness, style clarity, composition, mood, camera details, and generation quality.",
+#         "YouTube Scripts": "Make the prompt optimized for retention, hook strength, clear script flow, audience engagement, and strong CTA."
+#     }
+
+#     full_prompt = f"{base_instruction} {use_case_addons.get(use_case, '')}"
+#     return " ".join(full_prompt.split())
+
+# # -------------------------------
+# # SIDEBAR
+# # -------------------------------
+# with st.sidebar:
+#     st.markdown("""
+#     <div class="sidebar-logo">
+#         <div class="logo-title">PromptNexus AI</div>
+#         <div class="logo-subtitle">Where prompts become intelligence.</div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     st.markdown("### ⚡ Use Cases")
+#     st.markdown("""
+#     - Content Writing  
+#     - Coding  
+#     - Business  
+#     - Students  
+#     - Marketing  
+#     - Resume / Career  
+#     - Startup Ideas  
+#     - Social Media  
+#     - Email Writing  
+#     - Image Generation  
+#     - YouTube Scripts  
+#     - General Use  
+#     """)
+
+#     st.markdown("### 🎨 Prompt Styles")
+#     st.markdown("""
+#     - Professional  
+#     - Creative  
+#     - Minimal  
+#     - Cinematic  
+#     - Anime  
+#     - Realistic  
+#     - Expert  
+#     """)
+
+# # -------------------------------
+# # HERO
+# # -------------------------------
+# st.markdown("""
+# <div class="hero-card">
+#     <div class="badge">🚀 AI Prompt Workspace</div>
+#     <div class="hero-title">PromptNexus AI</div>
+#     <div class="hero-desc">
+#         Generate premium, professional, and ready-to-use prompts for content, coding, marketing, career growth,
+#         startup ideas, image generation, YouTube scripts, and more — all inside a futuristic SaaS-style interface.
+#     </div>
+# </div>
+# """, unsafe_allow_html=True)
+
+# # -------------------------------
+# # INPUTS
+# # -------------------------------
+# use_case_options = list(USE_CASE_CONFIG.keys())
+
+# col1, col2 = st.columns(2)
+
+# with col1:
+#     use_case = st.selectbox("Select Use Case", use_case_options)
+
+# config = USE_CASE_CONFIG[use_case]
+
+# with col2:
+#     style = st.selectbox(
+#         "Prompt Style",
+#         ["Professional", "Creative", "Minimal", "Cinematic", "Anime", "Realistic", "Expert"]
+#     )
+
+# col3, col4 = st.columns(2)
+
+# with col3:
+#     topic = st.text_input(
+#         "Topic / Goal",
+#         placeholder=config["topic_placeholder"]
+#     )
+#     st.markdown(
+#         f"""
+#         <div class="example-box">
+#             <b>Examples for {use_case}:</b><br>
+#             • {config["examples"][0]}<br>
+#             • {config["examples"][1]}<br>
+#             • {config["examples"][2]}
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+# with col4:
+#     audience = st.text_input(
+#         "Target Audience",
+#         placeholder=config["audience_placeholder"]
+#     )
+#     st.markdown(
+#         '<div class="small-note">Audience can also change based on use case selection.</div>',
+#         unsafe_allow_html=True
+#     )
+
+# extra_details = st.text_area(
+#     "Extra Details / Requirements",
+#     placeholder=config["extra_placeholder"],
+#     height=150
+# )
+
+# # -------------------------------
+# # BUTTONS
+# # -------------------------------
+# btn1, btn2 = st.columns([2, 1])
+
+# with btn1:
+#     if st.button("✨ Generate Prompt"):
+#         if topic.strip():
+#             st.session_state.generated_prompt = build_prompt(
+#                 use_case=use_case,
+#                 topic=topic,
+#                 style=style,
+#                 audience=audience.strip() if audience.strip() else "general users",
+#                 extra_details=extra_details
+#             )
+#         else:
+#             st.warning("Please enter a Topic / Goal first.")
+
+# with btn2:
+#     if st.button("🗑 Clear"):
+#         st.session_state.generated_prompt = ""
+
+# # -------------------------------
+# # OUTPUT
+# # -------------------------------
+# st.markdown('<div class="section-title">Prompt’s Generation</div>', unsafe_allow_html=True)
+
+# if st.session_state.generated_prompt:
+#     st.markdown(
+#         f"""
+#         <div class="prompt-box">
+#             <div class="prompt-heading">🎯 Prompt</div>
+#             {st.session_state.generated_prompt}
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+#     st.text_area(
+#         "Copy Prompt",
+#         value=st.session_state.generated_prompt,
+#         height=220
+#     )
+# else:
+#     st.markdown("""
+#     <div class="feature-card">
+#         <div class="feature-title">No prompt generated yet</div>
+#         <div class="feature-text">
+#             Select a use case, review the dynamic examples, enter your topic, and click <b>Generate Prompt</b>.
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# # -------------------------------
+# # FEATURES
+# # -------------------------------
+# st.markdown('<div class="section-title">Why PromptNexus AI?</div>', unsafe_allow_html=True)
+
+# f1, f2, f3 = st.columns(3)
+
+# with f1:
+#     st.markdown("""
+#     <div class="feature-card">
+#         <div class="feature-title">🧠 Dynamic Smart Guidance</div>
+#         <div class="feature-text">
+#             Topic examples and placeholders change automatically based on the selected use case, making prompt creation faster and smarter.
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# with f2:
+#     st.markdown("""
+#     <div class="feature-card">
+#         <div class="feature-title">🎨 More Use Cases</div>
+#         <div class="feature-text">
+#             Covers writing, coding, marketing, social media, resumes, startup ideas, image prompts, YouTube scripts, and more.
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# with f3:
+#     st.markdown("""
+#     <div class="feature-card">
+#         <div class="feature-title">⚡ Professional Prompt Quality</div>
+#         <div class="feature-text">
+#             Generates refined paragraph-style prompts that feel closer to premium AI workflow tools instead of basic prompt templates.
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+# # -------------------------------
+# # FOOTER
+# # -------------------------------
+# st.markdown("""
+# <br>
+# <div style="text-align:center; color:#94A3B8; font-size:14px; padding-bottom:10px;">
+#     Built with ❤️ By Ganesh Goddilla for smarter prompting • <b>PromptNexus AI</b>
+# </div>
+# """, unsafe_allow_html=True)
+
+
+
+
 import streamlit as st
+import streamlit.components.v1 as components
+import html
 
 # -------------------------------
 # PAGE CONFIG
@@ -2117,24 +2707,62 @@ section[data-testid="stSidebar"] {
     font-size: 15px;
 }
 
-.prompt-box {
+.prompt-card {
     background: linear-gradient(135deg, rgba(17,24,39,0.98), rgba(30,41,59,0.98));
     border: 1px solid rgba(0,212,255,0.22);
     border-radius: 22px;
     padding: 24px;
     box-shadow: 0 0 25px rgba(0,212,255,0.10), 0 0 35px rgba(168,85,247,0.10);
     margin-top: 18px;
+}
+
+.prompt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.prompt-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #FFFFFF;
+}
+
+.prompt-body {
     white-space: pre-wrap;
-    line-height: 1.75;
+    line-height: 1.9;
     font-size: 16px;
     color: #F8FAFC;
 }
 
-.prompt-heading {
-    font-size: 24px;
-    font-weight: 800;
-    margin-bottom: 14px;
-    color: #FFFFFF;
+.copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.04);
+    color: white;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 12px rgba(0,212,255,0.10);
+}
+
+.copy-btn:hover {
+    transform: translateY(-1px);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 18px rgba(0,212,255,0.22);
+}
+
+.copy-status {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #7dd3fc;
+    min-height: 18px;
 }
 
 label, .stSelectbox label, .stTextInput label, .stTextArea label {
@@ -2341,54 +2969,179 @@ USE_CASE_CONFIG = {
 }
 
 # -------------------------------
-# PROMPT GENERATOR LOGIC
+# STYLE INSTRUCTIONS
 # -------------------------------
-def build_prompt(use_case, topic, style, audience, extra_details):
-    style_map = {
-        "Professional": "Write in a polished, structured, professional tone with clarity and strong intent.",
-        "Creative": "Write in an imaginative, engaging, high-impact style with expressive language and originality.",
-        "Minimal": "Write in a concise, sharp, clean style with no fluff and maximum clarity.",
-        "Cinematic": "Write in a vivid, dramatic, immersive cinematic style with rich visual detail and emotional depth.",
-        "Anime": "Write in a visually expressive anime-inspired style with strong mood, dynamic imagery, and stylized details.",
-        "Realistic": "Write in a grounded, highly realistic style with precise details and practical clarity.",
-        "Expert": "Write in an advanced expert-level style with authority, precision, structure, and strategic detail."
-    }
+STYLE_GUIDE = {
+    "Professional": "Use a polished, structured, confident, and professional tone.",
+    "Creative": "Use engaging, imaginative, vivid, and fresh language.",
+    "Minimal": "Keep the wording concise, sharp, and direct with no fluff.",
+    "Cinematic": "Use immersive, visually rich, dramatic, and emotionally engaging language.",
+    "Anime": "Use expressive, stylized, vibrant, and visually dynamic language.",
+    "Realistic": "Use grounded, practical, precise, and believable details.",
+    "Expert": "Use advanced, strategic, highly refined, and authoritative language."
+}
 
-    base_instruction = f"""
-Act as an expert AI prompt engineer. Create a premium, highly effective prompt for the use case "{use_case}" focused on "{topic}".
+# -------------------------------
+# HELPERS
+# -------------------------------
+def clean_text(value: str) -> str:
+    return value.strip() if value else ""
 
-The prompt should be designed for {audience.lower()} and should generate output that is useful, clear, professional, and context-aware. {style_map[style]}
+def join_requirements(extra_details: str) -> str:
+    extra_details = clean_text(extra_details)
+    if not extra_details:
+        return ""
+    return f" Also ensure the output follows these requirements: {extra_details}."
 
-The final prompt must:
-- clearly define the AI's role
-- describe the task with strong intent
-- include the right tone and structure
-- request detailed, high-quality output
-- feel polished and ready for direct use in ChatGPT or any advanced AI tool
+def build_final_prompt(use_case, topic, style, audience, extra_details):
+    topic = clean_text(topic)
+    audience = clean_text(audience) or "the intended audience"
+    extra = join_requirements(extra_details)
+    style_instruction = STYLE_GUIDE.get(style, "Use clear and high-quality language.")
 
-Additional requirements and context:
-{extra_details if extra_details.strip() else "No extra constraints provided."}
+    if use_case == "Resume / Career":
+        return (
+            f"Act as an experienced career coach and professional personal branding expert. "
+            f"Write a strong, polished, and recruiter-friendly response about {topic} for {audience}. "
+            f"{style_instruction} Make the output clear, impactful, and tailored for real hiring scenarios. "
+            f"Highlight strengths, value, credibility, and professional positioning. "
+            f"Keep the language natural, confident, and modern while avoiding vague or generic statements."
+            f"{extra}"
+        )
 
-Return only one strong, refined, professional paragraph prompt.
-"""
+    elif use_case == "Content Writing":
+        return (
+            f"Act as an expert content writer and strategist. Create high-quality content about {topic} for {audience}. "
+            f"{style_instruction} Make the response engaging, well-structured, easy to read, and valuable to the target audience. "
+            f"Include a strong opening, smooth flow, relevant details, and a compelling ending. "
+            f"Ensure the writing feels polished, natural, and ready to publish."
+            f"{extra}"
+        )
 
-    use_case_addons = {
-        "Content Writing": "Make the prompt optimized for strong writing quality, readability, audience engagement, and content structure.",
-        "Coding": "Make the prompt optimized for clean code, correct logic, maintainability, explanations, and best practices.",
-        "Business": "Make the prompt optimized for strategic thinking, actionable insights, market relevance, and practical recommendations.",
-        "Students": "Make the prompt optimized for clear explanation, step-by-step teaching, easy understanding, and educational value.",
-        "General Use": "Make the prompt optimized for flexibility, clarity, and practical usefulness.",
-        "Marketing": "Make the prompt optimized for conversion, audience targeting, brand tone, persuasion, and campaign effectiveness.",
-        "Resume / Career": "Make the prompt optimized for hiring impact, clarity, ATS-friendly quality, and professional career positioning.",
-        "Startup Ideas": "Make the prompt optimized for innovation, business viability, target user pain points, and monetization potential.",
-        "Social Media": "Make the prompt optimized for attention-grabbing hooks, engagement, clarity, and platform-specific performance.",
-        "Email Writing": "Make the prompt optimized for professionalism, tone control, clarity, and actionable communication.",
-        "Image Generation": "Make the prompt optimized for visual richness, style clarity, composition, mood, camera details, and generation quality.",
-        "YouTube Scripts": "Make the prompt optimized for retention, hook strength, clear script flow, audience engagement, and strong CTA."
-    }
+    elif use_case == "Coding":
+        return (
+            f"Act as a senior software engineer and coding assistant. Help with {topic} for {audience}. "
+            f"{style_instruction} Provide clean, correct, production-quality output with clear logic, readable structure, and best practices. "
+            f"Include explanations where useful, handle edge cases when relevant, and keep the solution practical and maintainable."
+            f"{extra}"
+        )
 
-    full_prompt = f"{base_instruction} {use_case_addons.get(use_case, '')}"
-    return " ".join(full_prompt.split())
+    elif use_case == "Business":
+        return (
+            f"Act as a strategic business consultant. Create a clear, practical, and insight-driven response about {topic} for {audience}. "
+            f"{style_instruction} Focus on business value, execution, realistic strategy, and actionable recommendations. "
+            f"Make the output structured, professional, and useful for decision-making."
+            f"{extra}"
+        )
+
+    elif use_case == "Students":
+        return (
+            f"Act as an expert tutor and educational mentor. Explain or create content about {topic} for {audience}. "
+            f"{style_instruction} Make the response easy to understand, well-structured, accurate, and educational. "
+            f"Use simple explanations, step-by-step clarity, and examples wherever helpful."
+            f"{extra}"
+        )
+
+    elif use_case == "Marketing":
+        return (
+            f"Act as an expert marketing strategist and copywriter. Create marketing content for {topic} aimed at {audience}. "
+            f"{style_instruction} Focus on audience attention, clarity, persuasion, brand relevance, and conversion potential. "
+            f"Make the output compelling, strategic, and ready for practical campaign use."
+            f"{extra}"
+        )
+
+    elif use_case == "Startup Ideas":
+        return (
+            f"Act as an innovative startup advisor and product strategist. Generate strong ideas and strategic thinking around {topic} for {audience}. "
+            f"{style_instruction} Focus on real user pain points, market opportunity, differentiation, monetization, and execution potential. "
+            f"Keep the output practical, high-value, and startup-ready."
+            f"{extra}"
+        )
+
+    elif use_case == "Social Media":
+        return (
+            f"Act as a social media strategist and content creator. Create content around {topic} for {audience}. "
+            f"{style_instruction} Make the output attention-grabbing, platform-friendly, engaging, and easy to consume. "
+            f"Use strong hooks, clear flow, and content that encourages interaction or retention."
+            f"{extra}"
+        )
+
+    elif use_case == "Email Writing":
+        return (
+            f"Act as a professional communication expert. Write an effective email about {topic} for {audience}. "
+            f"{style_instruction} Make the email clear, polished, purposeful, and appropriate for the situation. "
+            f"Ensure the message has a strong subject line if relevant, natural wording, and a professional tone."
+            f"{extra}"
+        )
+
+    elif use_case == "Image Generation":
+        return (
+            f"Create an ultra-clear, highly descriptive image generation prompt for {topic}, designed for {audience}. "
+            f"{style_instruction} Include subject details, environment, composition, lighting, mood, camera feel, colors, textures, and quality cues. "
+            f"Make the final prompt visually rich, precise, and directly usable in image generation tools like Midjourney or similar platforms."
+            f"{extra}"
+        )
+
+    elif use_case == "YouTube Scripts":
+        return (
+            f"Act as an expert YouTube scriptwriter. Write a high-retention script about {topic} for {audience}. "
+            f"{style_instruction} Start with a strong hook, maintain clear pacing, keep the content engaging, and end with a strong closing or CTA. "
+            f"Make the script natural, audience-focused, and optimized for watch time and clarity."
+            f"{extra}"
+        )
+
+    else:
+        return (
+            f"Act as an expert assistant. Create a high-quality response about {topic} for {audience}. "
+            f"{style_instruction} Make the output clear, useful, polished, and practical. "
+            f"Ensure the final result is easy to understand and directly usable."
+            f"{extra}"
+        )
+
+def render_copyable_prompt(prompt_text: str):
+    escaped_prompt = html.escape(prompt_text)
+    js_safe_prompt = (
+        prompt_text
+        .replace("\\", "\\\\")
+        .replace("`", "\\`")
+        .replace("${", "\\${")
+    )
+
+    components.html(
+        f"""
+        <div class="prompt-card">
+            <div class="prompt-header">
+                <div class="prompt-title">🎯 Prompt</div>
+                <button class="copy-btn" onclick="copyPrompt()" title="Copy prompt">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="prompt-body">{escaped_prompt}</div>
+            <div id="copy-status" class="copy-status"></div>
+        </div>
+
+        <script>
+        async function copyPrompt() {{
+            const text = `{js_safe_prompt}`;
+            const status = document.getElementById("copy-status");
+            try {{
+                await navigator.clipboard.writeText(text);
+                status.innerText = "Copied to clipboard";
+                setTimeout(() => {{
+                    status.innerText = "";
+                }}, 1800);
+            }} catch (err) {{
+                status.innerText = "Copy failed";
+            }}
+        }}
+        </script>
+        """,
+        height=260,
+        scrolling=False
+    )
 
 # -------------------------------
 # SIDEBAR
@@ -2436,8 +3189,8 @@ st.markdown("""
     <div class="badge">🚀 AI Prompt Workspace</div>
     <div class="hero-title">PromptNexus AI</div>
     <div class="hero-desc">
-        Generate premium, professional, and ready-to-use prompts for content, coding, marketing, career growth,
-        startup ideas, image generation, YouTube scripts, and more — all inside a futuristic SaaS-style interface.
+        Generate final, ready-to-use, crystal-clear prompts for content, coding, marketing, resume building,
+        image generation, YouTube scripts, and more.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -2485,7 +3238,7 @@ with col4:
         placeholder=config["audience_placeholder"]
     )
     st.markdown(
-        '<div class="small-note">Audience can also change based on use case selection.</div>',
+        '<div class="small-note">Audience suggestions change based on selected use case.</div>',
         unsafe_allow_html=True
     )
 
@@ -2503,11 +3256,11 @@ btn1, btn2 = st.columns([2, 1])
 with btn1:
     if st.button("✨ Generate Prompt"):
         if topic.strip():
-            st.session_state.generated_prompt = build_prompt(
+            st.session_state.generated_prompt = build_final_prompt(
                 use_case=use_case,
                 topic=topic,
                 style=style,
-                audience=audience.strip() if audience.strip() else "general users",
+                audience=audience,
                 extra_details=extra_details
             )
         else:
@@ -2523,27 +3276,13 @@ with btn2:
 st.markdown('<div class="section-title">Prompt’s Generation</div>', unsafe_allow_html=True)
 
 if st.session_state.generated_prompt:
-    st.markdown(
-        f"""
-        <div class="prompt-box">
-            <div class="prompt-heading">🎯 Prompt</div>
-            {st.session_state.generated_prompt}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.text_area(
-        "Copy Prompt",
-        value=st.session_state.generated_prompt,
-        height=220
-    )
+    render_copyable_prompt(st.session_state.generated_prompt)
 else:
     st.markdown("""
     <div class="feature-card">
         <div class="feature-title">No prompt generated yet</div>
         <div class="feature-text">
-            Select a use case, review the dynamic examples, enter your topic, and click <b>Generate Prompt</b>.
+            Select a use case, review the examples, enter your topic, and click <b>Generate Prompt</b> to get a final ready-to-use prompt.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2558,9 +3297,9 @@ f1, f2, f3 = st.columns(3)
 with f1:
     st.markdown("""
     <div class="feature-card">
-        <div class="feature-title">🧠 Dynamic Smart Guidance</div>
+        <div class="feature-title">🧠 Final Prompt Output</div>
         <div class="feature-text">
-            Topic examples and placeholders change automatically based on the selected use case, making prompt creation faster and smarter.
+            Generates direct, usable prompts instead of prompt-overview text or prompt-to-generate-prompt structure.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2568,9 +3307,9 @@ with f1:
 with f2:
     st.markdown("""
     <div class="feature-card">
-        <div class="feature-title">🎨 More Use Cases</div>
+        <div class="feature-title">📋 One-Click Copy</div>
         <div class="feature-text">
-            Covers writing, coding, marketing, social media, resumes, startup ideas, image prompts, YouTube scripts, and more.
+            Copy the final prompt instantly from the icon inside the prompt card, without needing a separate copy section.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2578,9 +3317,9 @@ with f2:
 with f3:
     st.markdown("""
     <div class="feature-card">
-        <div class="feature-title">⚡ Professional Prompt Quality</div>
+        <div class="feature-title">⚡ Dynamic by Use Case</div>
         <div class="feature-text">
-            Generates refined paragraph-style prompts that feel closer to premium AI workflow tools instead of basic prompt templates.
+            Placeholders and examples update according to the selected use case, making the app smarter and easier to use.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2591,6 +3330,6 @@ with f3:
 st.markdown("""
 <br>
 <div style="text-align:center; color:#94A3B8; font-size:14px; padding-bottom:10px;">
-    Built with ❤️ By Ganesh Goddilla for smarter prompting • <b>PromptNexus AI</b>
+    Built with ❤️ By Ganesh Goddillafor smarter prompting • <b>PromptNexus AI</b>
 </div>
 """, unsafe_allow_html=True)
