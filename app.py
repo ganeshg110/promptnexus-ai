@@ -3784,120 +3784,143 @@ def render_copyable_prompt(prompt_text: str):
         .replace("${", "\\${")
     )
 
-    dynamic_height = min(max(360, 220 + prompt_text.count("\n") * 24), 900)
+    html_code = f"""
+    <html>
+    <head>
+    <style>
+        body {{
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: Inter, Arial, sans-serif;
+            color: white;
+        }}
 
-    components.html(
-        f"""
-        <html>
-        <head>
-        <style>
-            body {{
-                margin: 0;
-                padding: 0;
-                background: transparent;
-                font-family: Inter, Arial, sans-serif;
-                color: white;
-            }}
+        .prompt-card {{
+            width: 100%;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, rgba(17,24,39,0.98), rgba(30,41,59,0.98));
+            border: 1px solid rgba(0,212,255,0.22);
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 0 25px rgba(0,212,255,0.10), 0 0 35px rgba(168,85,247,0.10);
+        }}
 
-            .prompt-card {{
-                width: 100%;
-                box-sizing: border-box;
-                background: linear-gradient(135deg, rgba(17,24,39,0.98), rgba(30,41,59,0.98));
-                border: 1px solid rgba(0,212,255,0.22);
-                border-radius: 22px;
-                padding: 24px;
-                box-shadow: 0 0 25px rgba(0,212,255,0.10), 0 0 35px rgba(168,85,247,0.10);
-            }}
+        .prompt-title {{
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }}
 
-            .prompt-title {{
-                font-size: 22px;
-                font-weight: 800;
-                color: #ffffff;
-                margin-bottom: 16px;
-            }}
+        .prompt-body-wrap {{
+            max-height: 620px;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-bottom: 22px;
+        }}
 
-            .prompt-body {{
-                font-size: 15px;
-                line-height: 1.9;
-                color: #F8FAFC;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                white-space: normal;
-                margin-bottom: 22px;
-            }}
+        .prompt-body {{
+            font-size: 15px;
+            line-height: 1.9;
+            color: #F8FAFC;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }}
 
-            .prompt-footer {{
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-                gap: 12px;
-            }}
+        .prompt-footer {{
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+        }}
 
-            .copy-btn {{
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 44px;
-                height: 44px;
-                border-radius: 14px;
-                border: 1px solid rgba(255,255,255,0.10);
-                background: rgba(255,255,255,0.05);
-                color: white;
-                cursor: pointer;
-                transition: all 0.25s ease;
-                box-shadow: 0 0 12px rgba(0,212,255,0.10);
-            }}
+        .copy-btn {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 12px rgba(0,212,255,0.10);
+        }}
 
-            .copy-btn:hover {{
-                transform: translateY(-1px);
-                background: rgba(255,255,255,0.08);
-                box-shadow: 0 0 18px rgba(0,212,255,0.22);
-            }}
+        .copy-btn:hover {{
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 18px rgba(0,212,255,0.22);
+        }}
 
-            .copy-status {{
-                font-size: 13px;
-                color: #7dd3fc;
-                min-width: 110px;
-                text-align: right;
-            }}
-        </style>
-        </head>
-        <body>
-            <div class="prompt-card">
-                <div class="prompt-title">🎯 Prompt</div>
+        .copy-status {{
+            font-size: 13px;
+            color: #7dd3fc;
+            min-width: 110px;
+            text-align: right;
+        }}
+
+        .prompt-body-wrap::-webkit-scrollbar {{
+            width: 8px;
+        }}
+
+        .prompt-body-wrap::-webkit-scrollbar-thumb {{
+            background: rgba(125, 211, 252, 0.35);
+            border-radius: 10px;
+        }}
+
+        .prompt-body-wrap::-webkit-scrollbar-track {{
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+        }}
+    </style>
+    </head>
+    <body>
+        <div class="prompt-card">
+            <div class="prompt-title">🎯 Prompt</div>
+
+            <div class="prompt-body-wrap">
                 <div class="prompt-body">{escaped_prompt}</div>
-
-                <div class="prompt-footer">
-                    <div id="copy-status" class="copy-status"></div>
-                    <button class="copy-btn" onclick="copyPrompt()" title="Copy prompt">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                    </button>
-                </div>
             </div>
 
-            <script>
-            async function copyPrompt() {{
-                const text = `{js_safe_prompt}`;
-                const status = document.getElementById("copy-status");
-                try {{
-                    await navigator.clipboard.writeText(text);
-                    status.innerText = "Copied";
-                    setTimeout(() => {{
-                        status.innerText = "";
-                    }}, 1500);
-                }} catch (err) {{
-                    status.innerText = "Copy failed";
-                }}
+            <div class="prompt-footer">
+                <div id="copy-status" class="copy-status"></div>
+                <button class="copy-btn" onclick="copyPrompt()" title="Copy prompt">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <script>
+        async function copyPrompt() {{
+            const text = `{js_safe_prompt}`;
+            const status = document.getElementById("copy-status");
+            try {{
+                await navigator.clipboard.writeText(text);
+                status.innerText = "Copied";
+                setTimeout(() => {{
+                    status.innerText = "";
+                }}, 1500);
+            }} catch (err) {{
+                status.innerText = "Copy failed";
             }}
-            </script>
-        </body>
-        </html>
-        """,
-        height=dynamic_height,
-        scrolling=False
+        }}
+        </script>
+    </body>
+    </html>
+    """
+
+    components.html(
+        html_code,
+        height=900,
+        scrolling=True
     )
 
 # -------------------------------
