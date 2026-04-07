@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # -------------------------------
-# SESSION STATE
+# SESSION STATE DEFAULTS
 # -------------------------------
 defaults = {
     "generated_prompt": "",
@@ -25,6 +25,8 @@ defaults = {
     "topic_value": "",
     "audience_value": "",
     "extra_value": "",
+    "use_case_select": "Content Writing",
+    "style_select": "Professional",
 }
 for key, value in defaults.items():
     if key not in st.session_state:
@@ -482,6 +484,17 @@ def add_to_favorites(use_case: str, topic: str, prompt: str) -> None:
         })
         st.session_state.favorites = st.session_state.favorites[:20]
 
+def set_random_topic():
+    current_use_case = st.session_state.get("use_case_select", "Content Writing")
+    current_config = USE_CASE_CONFIG[current_use_case]
+    st.session_state["topic_value"] = random.choice(current_config["random_topics"])
+
+def clear_all():
+    st.session_state.generated_prompt = ""
+    st.session_state.topic_value = ""
+    st.session_state.audience_value = ""
+    st.session_state.extra_value = ""
+
 def build_image_prompt(
     topic: str,
     style: str,
@@ -847,14 +860,15 @@ use_case_options = list(USE_CASE_CONFIG.keys())
 
 col1, col2 = st.columns(2)
 with col1:
-    use_case = st.selectbox("Select Use Case", use_case_options)
+    use_case = st.selectbox("Select Use Case", use_case_options, key="use_case_select")
 
 config = USE_CASE_CONFIG[use_case]
 
 with col2:
     style = st.selectbox(
         "Prompt Style",
-        ["Professional", "Creative", "Minimal", "Cinematic", "Anime", "Realistic", "Expert"]
+        ["Professional", "Creative", "Minimal", "Cinematic", "Anime", "Realistic", "Expert"],
+        key="style_select"
     )
 
 col3, col4 = st.columns(2)
@@ -896,11 +910,9 @@ extra_details = st.text_area(
 )
 
 # -------------------------------
-# RANDOM PROMPT
+# RANDOM PROMPT BUTTON
 # -------------------------------
-if st.button("🎲 Random Prompt Idea"):
-    st.session_state["topic_value"] = random.choice(config["random_topics"])
-    st.rerun()
+st.button("🎲 Random Prompt Idea", on_click=set_random_topic)
 
 # -------------------------------
 # IMAGE ADVANCED CONTROLS
@@ -967,9 +979,9 @@ def generate_current_prompt():
         return
 
     prompt = build_final_prompt(
-        use_case=use_case,
+        use_case=st.session_state.get("use_case_select", "Content Writing"),
         topic=current_topic,
-        style=style,
+        style=st.session_state.get("style_select", "Professional"),
         audience=current_audience,
         extra_details=current_extra,
         image_settings=image_settings
@@ -977,18 +989,15 @@ def generate_current_prompt():
 
     st.session_state.generated_prompt = prompt
     st.session_state.last_generation_payload = {
-        "use_case": use_case,
-        "style": style,
+        "use_case": st.session_state.get("use_case_select", "Content Writing"),
+        "style": st.session_state.get("style_select", "Professional"),
         "topic": current_topic,
         "audience": current_audience,
         "extra_details": current_extra,
         "image_settings": image_settings.copy()
     }
-    add_to_history(use_case, current_topic, prompt)
+    add_to_history(st.session_state.get("use_case_select", "Content Writing"), current_topic, prompt)
 
-# -------------------------------
-# ACTION BUTTONS
-# -------------------------------
 b1, b2, b3, b4 = st.columns(4)
 
 with b1:
@@ -1016,17 +1025,13 @@ with b3:
     if st.button("⭐ Save Favorite"):
         if st.session_state.generated_prompt:
             current_topic = st.session_state.get("topic_value", "").strip() or "Untitled"
-            add_to_favorites(use_case, current_topic, st.session_state.generated_prompt)
+            add_to_favorites(st.session_state.get("use_case_select", "Content Writing"), current_topic, st.session_state.generated_prompt)
             st.success("Added to favorites")
         else:
             st.info("Generate a prompt first.")
 
 with b4:
-    if st.button("🗑 Clear"):
-        st.session_state.generated_prompt = ""
-        st.session_state.topic_value = ""
-        st.session_state.audience_value = ""
-        st.session_state.extra_value = ""
+    st.button("🗑 Clear", on_click=clear_all)
 
 # -------------------------------
 # OUTPUT
@@ -1034,7 +1039,7 @@ with b4:
 st.markdown('<div class="section-title">Prompt’s Generation</div>', unsafe_allow_html=True)
 
 if st.session_state.generated_prompt:
-    if use_case == "Image Generation":
+    if st.session_state.get("use_case_select") == "Image Generation":
         st.markdown("""
         <div style="margin-bottom:8px;">
             <span class="prompt-chip">Direct image prompt</span>
@@ -1153,6 +1158,6 @@ with f3:
 st.markdown("""
 <br>
 <div style="text-align:center; color:#94A3B8; font-size:14px; padding-bottom:10px;">
-    Built with ❤️ By GANESH GODDILLA for smarter prompting • <b>PromptNexus AI</b>
+    Built with ❤️ By GANESH GODDILLAfor smarter prompting • <b>PromptNexus AI</b>
 </div>
 """, unsafe_allow_html=True)
