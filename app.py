@@ -3317,6 +3317,8 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import html
+import random
+from datetime import datetime
 
 # -------------------------------
 # PAGE CONFIG
@@ -3333,6 +3335,15 @@ st.set_page_config(
 # -------------------------------
 if "generated_prompt" not in st.session_state:
     st.session_state.generated_prompt = ""
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+if "favorites" not in st.session_state:
+    st.session_state.favorites = []
+
+if "last_generation_payload" not in st.session_state:
+    st.session_state.last_generation_payload = None
 
 # -------------------------------
 # CUSTOM CSS
@@ -3423,7 +3434,7 @@ section[data-testid="stSidebar"] {
     font-size: 15px;
 }
 
-label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider label, .stNumberInput label {
+label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider label {
     color: #E5E7EB !important;
     font-weight: 600 !important;
 }
@@ -3504,12 +3515,6 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     margin-top: 4px;
 }
 
-.stExpander {
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 16px !important;
-    overflow: hidden;
-}
-
 .prompt-chip {
     display: inline-block;
     padding: 6px 10px;
@@ -3520,11 +3525,56 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
 }
+
+.history-card {
+    background: rgba(17,24,39,0.82);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.history-meta {
+    color: #94A3B8;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.history-title {
+    color: #F8FAFC;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.history-text {
+    color: #CBD5E1;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.stDownloadButton > button {
+    width: 100%;
+    border-radius: 16px;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    font-size: 15px;
+    color: white;
+    background: linear-gradient(90deg, #111827, #1F2937);
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+div[data-testid="stExpander"] {
+    border-radius: 16px !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    overflow: hidden;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# USE CASE DATA
+# DATA
 # -------------------------------
 USE_CASE_CONFIG = {
     "Content Writing": {
@@ -3535,6 +3585,11 @@ USE_CASE_CONFIG = {
             "Instagram caption for a fitness brand launch",
             "SEO blog post on beginner MLOps roadmap",
             "LinkedIn post about GenAI career transition"
+        ],
+        "random_topics": [
+            "LinkedIn post about AI productivity tools",
+            "Blog article on beginner MLOps roadmap",
+            "Instagram caption for a new tech gadget launch"
         ]
     },
     "Coding": {
@@ -3545,6 +3600,11 @@ USE_CASE_CONFIG = {
             "Streamlit app for AI prompt generator",
             "FastAPI REST API with authentication",
             "Python function to parse logs and summarize errors"
+        ],
+        "random_topics": [
+            "Python script to organize files by extension",
+            "FastAPI endpoint with JWT authentication",
+            "Streamlit dashboard for sales analytics"
         ]
     },
     "Business": {
@@ -3554,6 +3614,11 @@ USE_CASE_CONFIG = {
         "examples": [
             "Business plan for a faceless YouTube automation agency",
             "Pricing strategy for AI SaaS tool",
+            "Go-to-market plan for student productivity app"
+        ],
+        "random_topics": [
+            "Pricing strategy for AI SaaS product",
+            "Business model for freelancer marketplace",
             "Go-to-market plan for student productivity app"
         ]
     },
@@ -3565,6 +3630,11 @@ USE_CASE_CONFIG = {
             "Study notes for DBMS interview preparation",
             "Simple explanation of cloud computing",
             "5-mark answer for machine learning basics"
+        ],
+        "random_topics": [
+            "Simple explanation of cloud computing",
+            "DBMS notes for interview preparation",
+            "Machine learning basics for beginners"
         ]
     },
     "General Use": {
@@ -3574,6 +3644,11 @@ USE_CASE_CONFIG = {
         "examples": [
             "Professional apology email to manager",
             "Daily planner for a productive workday",
+            "Checklist for moving to a new city"
+        ],
+        "random_topics": [
+            "Professional apology email to manager",
+            "Daily productivity planner",
             "Checklist for moving to a new city"
         ]
     },
@@ -3585,6 +3660,11 @@ USE_CASE_CONFIG = {
             "Facebook ad copy for skincare product",
             "Email campaign for Black Friday sale",
             "Brand tagline ideas for AI startup"
+        ],
+        "random_topics": [
+            "Facebook ad copy for skincare brand",
+            "Email campaign for festive sale",
+            "Tagline ideas for AI startup"
         ]
     },
     "Resume / Career": {
@@ -3595,6 +3675,11 @@ USE_CASE_CONFIG = {
             "Resume bullet points for Python developer",
             "Cover letter for GenAI engineer role",
             "LinkedIn About section for fresher in MLOps"
+        ],
+        "random_topics": [
+            "LinkedIn About section for fresher in MLOps",
+            "Resume summary for Python developer",
+            "Cover letter for GenAI engineer role"
         ]
     },
     "Startup Ideas": {
@@ -3605,6 +3690,11 @@ USE_CASE_CONFIG = {
             "Low-cost AI SaaS ideas for India",
             "B2B startup idea for internal documentation",
             "One-person startup ideas in automation"
+        ],
+        "random_topics": [
+            "AI startup ideas for education",
+            "One-person startup ideas in automation",
+            "B2B AI tool for internal documentation"
         ]
     },
     "Social Media": {
@@ -3615,6 +3705,11 @@ USE_CASE_CONFIG = {
             "YouTube Shorts script on AI tools",
             "Twitter thread on beginner coding mistakes",
             "Instagram carousel post on career growth"
+        ],
+        "random_topics": [
+            "10 Instagram reel ideas for AI productivity",
+            "Twitter thread on common coding mistakes",
+            "Carousel post on career growth tips"
         ]
     },
     "Email Writing": {
@@ -3625,16 +3720,26 @@ USE_CASE_CONFIG = {
             "Leave request email",
             "Follow-up email after interview",
             "Formal escalation email for blocked task"
+        ],
+        "random_topics": [
+            "Leave request email",
+            "Interview follow-up email",
+            "Formal escalation email for blocked task"
         ]
     },
     "Image Generation": {
         "topic_placeholder": "e.g. Marvel-style superhero poster in pastel space",
         "audience_placeholder": "e.g. creators, designers, Midjourney users",
-        "extra_placeholder": "Mention any must-have visual details, elements, or restrictions.",
+        "extra_placeholder": "Mention must-have details, pose, objects, setting, color direction, or restrictions.",
         "examples": [
             "Anime warrior in neon city at night",
             "Luxury product ad shot with soft lighting",
             "Marvel-style superhero poster in pastel space"
+        ],
+        "random_topics": [
+            "Marvel-style superhero poster in pastel space",
+            "Anime warrior in neon city at night",
+            "Cyberpunk female assassin in rainy alley"
         ]
     },
     "YouTube Scripts": {
@@ -3645,6 +3750,11 @@ USE_CASE_CONFIG = {
             "60-second script for motivation reel",
             "Faceless finance video script",
             "Tech explainer script on ChatGPT vs OpenAI"
+        ],
+        "random_topics": [
+            "60-second YouTube script on top AI tools",
+            "Faceless finance video script",
+            "Tech explainer on ChatGPT vs OpenAI"
         ]
     }
 }
@@ -3659,9 +3769,6 @@ STYLE_GUIDE = {
     "Expert": "Use advanced, strategic, highly refined, and authoritative language."
 }
 
-# -------------------------------
-# IMAGE PROMPT OPTION SETS
-# -------------------------------
 SHOT_OPTIONS = [
     "low-angle hero shot", "close-up portrait", "wide cinematic shot", "mid-shot composition",
     "full-body character shot", "over-the-shoulder shot", "bird's-eye view", "dynamic action frame"
@@ -3708,20 +3815,31 @@ NEGATIVE_DEFAULT = "blurry, low quality, distorted anatomy, extra fingers, cropp
 def clean_text(value: str) -> str:
     return value.strip() if value else ""
 
-def normalize_sentence(text: str) -> str:
-    text = clean_text(text)
-    if not text:
-        return ""
-    return text[0].upper() + text[1:]
-
-def join_requirements(extra_details: str) -> str:
-    extra_details = clean_text(extra_details)
-    if not extra_details:
-        return ""
-    return f" Also ensure the output follows these requirements: {extra_details}."
-
 def compact_join(parts):
     return ", ".join([p for p in parts if clean_text(p)])
+
+def add_to_history(use_case: str, topic: str, prompt: str) -> None:
+    entry = {
+        "use_case": use_case,
+        "topic": topic,
+        "prompt": prompt,
+        "timestamp": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    }
+    st.session_state.history.insert(0, entry)
+    st.session_state.history = st.session_state.history[:10]
+
+def add_to_favorites(use_case: str, topic: str, prompt: str) -> None:
+    already_exists = any(
+        fav["prompt"] == prompt for fav in st.session_state.favorites
+    )
+    if not already_exists:
+        st.session_state.favorites.insert(0, {
+            "use_case": use_case,
+            "topic": topic,
+            "prompt": prompt,
+            "timestamp": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        })
+        st.session_state.favorites = st.session_state.favorites[:20]
 
 def build_image_prompt(
     topic: str,
@@ -3754,8 +3872,6 @@ def build_image_prompt(
         "Expert": "An ultra-refined, masterfully art-directed visual of"
     }
 
-    base_prefix = style_prefix_map.get(style, "A highly detailed visual of")
-
     style_suffix_map = {
         "Cinematic": "high-octane cinematic movie poster composition",
         "Anime": "dynamic anime key visual composition",
@@ -3766,22 +3882,23 @@ def build_image_prompt(
         "Expert": "world-class concept art composition"
     }
 
+    base_prefix = style_prefix_map.get(style, "A highly detailed visual of")
     composition_style = style_suffix_map.get(style, "premium composition")
 
     if style == "Anime":
-        stylize_tag = f"--stylize {stylize} --chaos {chaos} --quality {quality} --ar {aspect_ratio} --niji 6"
+        tag_block = f"--stylize {stylize} --chaos {chaos} --quality {quality} --ar {aspect_ratio} --niji 6"
     else:
-        stylize_tag = f"--stylize {stylize} --chaos {chaos} --quality {quality} --ar {aspect_ratio}"
+        tag_block = f"--stylize {stylize} --chaos {chaos} --quality {quality} --ar {aspect_ratio}"
 
     body_parts = [
         f"{base_prefix} {topic}",
-        f"{shot_type}",
+        shot_type,
         f"{mood} atmosphere",
-        f"{lighting}",
-        f"{camera}",
+        lighting,
+        camera,
         f"color palette of {palette}",
-        f"{texture}",
-        f"{composition_style}",
+        texture,
+        composition_style,
         render_quality,
         "sharp focus",
         "intricate details",
@@ -3797,12 +3914,12 @@ def build_image_prompt(
         neg = clean_text(negative_prompt) or NEGATIVE_DEFAULT
         prompt = f"{prompt} --no {neg}"
 
-    return f"{prompt} {stylize_tag}".strip()
+    return f"{prompt} {tag_block}".strip()
 
 def build_final_prompt(use_case, topic, style, audience, extra_details, image_settings):
     topic = clean_text(topic)
     audience = clean_text(audience) or "the intended audience"
-    extra = join_requirements(extra_details)
+    extra_details = clean_text(extra_details)
     style_instruction = STYLE_GUIDE.get(style, "Use clear and high-quality language.")
 
     if use_case == "Image Generation":
@@ -3831,89 +3948,89 @@ def build_final_prompt(use_case, topic, style, audience, extra_details, image_se
             f"Write a strong, polished, and recruiter-friendly response about {topic} for {audience}. "
             f"{style_instruction} Make the output clear, impactful, and tailored for real hiring scenarios. "
             f"Highlight strengths, value, credibility, and professional positioning. "
-            f"Keep the language natural, confident, and modern while avoiding vague or generic statements."
-            f"{extra}"
-        )
+            f"Keep the language natural, confident, and modern while avoiding vague or generic statements. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Content Writing":
         return (
             f"Act as an expert content writer and strategist. Create high-quality content about {topic} for {audience}. "
             f"{style_instruction} Make the response engaging, well-structured, easy to read, and valuable to the target audience. "
             f"Include a strong opening, smooth flow, relevant details, and a compelling ending. "
-            f"Ensure the writing feels polished, natural, and ready to publish."
-            f"{extra}"
-        )
+            f"Ensure the writing feels polished, natural, and ready to publish. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Coding":
         return (
             f"Act as a senior software engineer and coding assistant. Help with {topic} for {audience}. "
-            f"{style_instruction} Provide clean, correct, production-quality output with clear logic, readable structure, and best practices. "
-            f"Include explanations where useful, handle edge cases when relevant, and keep the solution practical and maintainable."
-            f"{extra}"
-        )
+            f"{style_instruction} Provide clean, correct, production-ready output with clear logic, readable structure, and best practices. "
+            f"Include explanations where useful, handle edge cases when relevant, and keep the solution practical and maintainable. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Business":
         return (
             f"Act as a strategic business consultant. Create a clear, practical, and insight-driven response about {topic} for {audience}. "
             f"{style_instruction} Focus on business value, execution, realistic strategy, and actionable recommendations. "
-            f"Make the output structured, professional, and useful for decision-making."
-            f"{extra}"
-        )
+            f"Make the output structured, professional, and useful for decision-making. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Students":
         return (
             f"Act as an expert tutor and educational mentor. Explain or create content about {topic} for {audience}. "
             f"{style_instruction} Make the response easy to understand, well-structured, accurate, and educational. "
-            f"Use simple explanations, step-by-step clarity, and examples wherever helpful."
-            f"{extra}"
-        )
+            f"Use simple explanations, step-by-step clarity, and examples wherever helpful. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Marketing":
         return (
             f"Act as an expert marketing strategist and copywriter. Create marketing content for {topic} aimed at {audience}. "
             f"{style_instruction} Focus on audience attention, clarity, persuasion, brand relevance, and conversion potential. "
-            f"Make the output compelling, strategic, and ready for practical campaign use."
-            f"{extra}"
-        )
+            f"Make the output compelling, strategic, and ready for practical campaign use. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Startup Ideas":
         return (
             f"Act as an innovative startup advisor and product strategist. Generate strong ideas and strategic thinking around {topic} for {audience}. "
             f"{style_instruction} Focus on real user pain points, market opportunity, differentiation, monetization, and execution potential. "
-            f"Keep the output practical, high-value, and startup-ready."
-            f"{extra}"
-        )
+            f"Keep the output practical, high-value, and startup-ready. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Social Media":
         return (
             f"Act as a social media strategist and content creator. Create content around {topic} for {audience}. "
             f"{style_instruction} Make the output attention-grabbing, platform-friendly, engaging, and easy to consume. "
-            f"Use strong hooks, clear flow, and content that encourages interaction or retention."
-            f"{extra}"
-        )
+            f"Use strong hooks, clear flow, and content that encourages interaction or retention. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "Email Writing":
         return (
             f"Act as a professional communication expert. Write an effective email about {topic} for {audience}. "
             f"{style_instruction} Make the email clear, polished, purposeful, and appropriate for the situation. "
-            f"Ensure the message has a strong subject line if relevant, natural wording, and a professional tone."
-            f"{extra}"
-        )
+            f"Ensure the message has natural wording and a professional tone. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     if use_case == "YouTube Scripts":
         return (
             f"Act as an expert YouTube scriptwriter. Write a high-retention script about {topic} for {audience}. "
             f"{style_instruction} Start with a strong hook, maintain clear pacing, keep the content engaging, and end with a strong closing or CTA. "
-            f"Make the script natural, audience-focused, and optimized for watch time and clarity."
-            f"{extra}"
-        )
+            f"Make the script natural, audience-focused, and optimized for watch time and clarity. "
+            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        ).strip()
 
     return (
         f"Act as an expert assistant. Create a high-quality response about {topic} for {audience}. "
         f"{style_instruction} Make the output clear, useful, polished, and practical. "
-        f"Ensure the final result is easy to understand and directly usable."
-        f"{extra}"
-    )
+        f"Ensure the final result is easy to understand and directly usable. "
+        f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+    ).strip()
 
 def render_copyable_prompt(prompt_text: str):
     escaped_prompt = html.escape(prompt_text).replace("\n", "<br>")
@@ -4034,7 +4151,7 @@ def render_copyable_prompt(prompt_text: str):
         </body>
         </html>
         """,
-        height=340,
+        height=360,
         scrolling=False
     )
 
@@ -4065,25 +4182,15 @@ with st.sidebar:
     - General Use  
     """)
 
-    st.markdown("### 🎨 Prompt Styles")
+    st.markdown("### ✨ Features")
     st.markdown("""
-    - Professional  
-    - Creative  
-    - Minimal  
-    - Cinematic  
-    - Anime  
-    - Realistic  
-    - Expert  
-    """)
-
-    st.markdown("### 🧪 Pro Image Features")
-    st.markdown("""
-    - Style-aware image prompting  
-    - Camera + lighting control  
-    - Mood + color palette  
-    - Aspect ratio + stylize  
-    - Chaos + quality  
-    - Optional negative prompt  
+    - Prompt history  
+    - Favorites  
+    - Random prompt  
+    - Regenerate  
+    - Download prompt  
+    - One-click copy  
+    - Pro image controls  
     """)
 
 # -------------------------------
@@ -4094,8 +4201,8 @@ st.markdown("""
     <div class="badge">🚀 AI Prompt Workspace</div>
     <div class="hero-title">PromptNexus AI</div>
     <div class="hero-desc">
-        Generate final, crystal-clear prompts for content, coding, career, marketing, and especially
-        ultra-detailed image generation prompts with pro-level controls.
+        Generate final, crystal-clear prompts for content, coding, career, marketing, and ultra-detailed image generation.
+        Includes history, favorites, random ideas, regenerate, download, and one-click copy.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -4121,7 +4228,7 @@ with col2:
 col3, col4 = st.columns(2)
 
 with col3:
-    topic = st.text_input("Topic / Goal", placeholder=config["topic_placeholder"])
+    topic = st.text_input("Topic / Goal", placeholder=config["topic_placeholder"], key="topic_input")
     st.markdown(
         f"""
         <div class="example-box">
@@ -4135,7 +4242,7 @@ with col3:
     )
 
 with col4:
-    audience = st.text_input("Target Audience", placeholder=config["audience_placeholder"])
+    audience = st.text_input("Target Audience", placeholder=config["audience_placeholder"], key="audience_input")
     st.markdown(
         '<div class="small-note">Audience suggestions change based on selected use case.</div>',
         unsafe_allow_html=True
@@ -4144,8 +4251,17 @@ with col4:
 extra_details = st.text_area(
     "Extra Details / Requirements",
     placeholder=config["extra_placeholder"],
-    height=130
+    height=130,
+    key="extra_input"
 )
+
+# -------------------------------
+# RANDOM PROMPT
+# -------------------------------
+if st.button("🎲 Random Prompt Idea"):
+    random_topic = random.choice(config["random_topics"])
+    st.session_state.topic_input = random_topic
+    st.rerun()
 
 # -------------------------------
 # IMAGE ADVANCED CONTROLS
@@ -4186,11 +4302,7 @@ if use_case == "Image Generation":
 
         with g3:
             image_settings["render_quality"] = st.selectbox("Render Style", RENDER_OPTIONS, index=0)
-            image_settings["aspect_ratio"] = st.selectbox(
-                "Aspect Ratio",
-                ["1:1", "2:3", "3:2", "4:5", "9:16", "16:9", "21:9"],
-                index=1
-            )
+            image_settings["aspect_ratio"] = st.selectbox("Aspect Ratio", ["1:1", "2:3", "3:2", "4:5", "9:16", "16:9", "21:9"], index=1)
             image_settings["quality"] = st.selectbox("Quality", ["0.5", "1", "2"], index=1)
 
         s1, s2 = st.columns(2)
@@ -4198,8 +4310,6 @@ if use_case == "Image Generation":
             image_settings["stylize"] = st.slider("Stylize", 0, 1000, 750, 25)
         with s2:
             image_settings["chaos"] = st.slider("Chaos", 0, 100, 12, 1)
-
-        st.markdown('<div class="advanced-note">These controls are only for generating better prompts. They do not require paid features in your app.</div>', unsafe_allow_html=True)
 
         image_settings["include_negative"] = st.checkbox("Include negative prompt", value=True)
         if image_settings["include_negative"]:
@@ -4220,25 +4330,73 @@ if use_case == "Image Generation":
         """, unsafe_allow_html=True)
 
 # -------------------------------
-# BUTTONS
+# GENERATE FUNCTION
 # -------------------------------
-btn1, btn2 = st.columns([2, 1])
+def generate_current_prompt():
+    current_topic = st.session_state.get("topic_input", "").strip()
+    current_audience = st.session_state.get("audience_input", "").strip()
+    current_extra = st.session_state.get("extra_input", "").strip()
 
-with btn1:
+    if not current_topic:
+        st.warning("Please enter a Topic / Goal first.")
+        return
+
+    prompt = build_final_prompt(
+        use_case=use_case,
+        topic=current_topic,
+        style=style,
+        audience=current_audience,
+        extra_details=current_extra,
+        image_settings=image_settings
+    )
+
+    st.session_state.generated_prompt = prompt
+    st.session_state.last_generation_payload = {
+        "use_case": use_case,
+        "style": style,
+        "topic": current_topic,
+        "audience": current_audience,
+        "extra_details": current_extra,
+        "image_settings": image_settings.copy()
+    }
+    add_to_history(use_case, current_topic, prompt)
+
+# -------------------------------
+# ACTION BUTTONS
+# -------------------------------
+b1, b2, b3, b4 = st.columns(4)
+
+with b1:
     if st.button("✨ Generate Prompt"):
-        if topic.strip():
-            st.session_state.generated_prompt = build_final_prompt(
-                use_case=use_case,
-                topic=topic,
-                style=style,
-                audience=audience,
-                extra_details=extra_details,
-                image_settings=image_settings
-            )
-        else:
-            st.warning("Please enter a Topic / Goal first.")
+        generate_current_prompt()
 
-with btn2:
+with b2:
+    if st.button("🔁 Regenerate"):
+        if st.session_state.last_generation_payload:
+            payload = st.session_state.last_generation_payload
+            regenerated = build_final_prompt(
+                use_case=payload["use_case"],
+                topic=payload["topic"],
+                style=payload["style"],
+                audience=payload["audience"],
+                extra_details=payload["extra_details"],
+                image_settings=payload["image_settings"]
+            )
+            st.session_state.generated_prompt = regenerated
+            add_to_history(payload["use_case"], payload["topic"], regenerated)
+        else:
+            st.info("Generate a prompt first.")
+
+with b3:
+    if st.button("⭐ Save Favorite"):
+        if st.session_state.generated_prompt:
+            current_topic = st.session_state.get("topic_input", "").strip() or "Untitled"
+            add_to_favorites(use_case, current_topic, st.session_state.generated_prompt)
+            st.success("Added to favorites")
+        else:
+            st.info("Generate a prompt first.")
+
+with b4:
     if st.button("🗑 Clear"):
         st.session_state.generated_prompt = ""
 
@@ -4256,7 +4414,15 @@ if st.session_state.generated_prompt:
             <span class="prompt-chip">Pro visual detail</span>
         </div>
         """, unsafe_allow_html=True)
+
     render_copyable_prompt(st.session_state.generated_prompt)
+
+    st.download_button(
+        label="📥 Download Prompt",
+        data=st.session_state.generated_prompt,
+        file_name="promptnexus_prompt.txt",
+        mime="text/plain"
+    )
 else:
     st.markdown("""
     <div class="feature-card">
@@ -4266,6 +4432,55 @@ else:
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+# -------------------------------
+# HISTORY + FAVORITES
+# -------------------------------
+left_panel, right_panel = st.columns(2)
+
+with left_panel:
+    st.markdown('<div class="section-title">Recent Prompt History</div>', unsafe_allow_html=True)
+    if st.session_state.history:
+        for item in st.session_state.history[:5]:
+            st.markdown(
+                f"""
+                <div class="history-card">
+                    <div class="history-meta">{item['timestamp']} • {item['use_case']}</div>
+                    <div class="history-title">{item['topic']}</div>
+                    <div class="history-text">{html.escape(item['prompt'][:220])}{"..." if len(item['prompt']) > 220 else ""}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+    else:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-title">No history yet</div>
+            <div class="feature-text">Your recent prompts will appear here.</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+with right_panel:
+    st.markdown('<div class="section-title">Favorite Prompts</div>', unsafe_allow_html=True)
+    if st.session_state.favorites:
+        for item in st.session_state.favorites[:5]:
+            st.markdown(
+                f"""
+                <div class="history-card">
+                    <div class="history-meta">{item['timestamp']} • {item['use_case']}</div>
+                    <div class="history-title">{item['topic']}</div>
+                    <div class="history-text">{html.escape(item['prompt'][:220])}{"..." if len(item['prompt']) > 220 else ""}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+    else:
+        st.markdown("""
+        <div class="feature-card">
+            <div class="feature-title">No favorites yet</div>
+            <div class="feature-text">Save your best prompts to see them here.</div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # -------------------------------
 # FEATURES
@@ -4287,9 +4502,9 @@ with f1:
 with f2:
     st.markdown("""
     <div class="feature-card">
-        <div class="feature-title">🎨 Midjourney-Level Feel</div>
+        <div class="feature-title">📜 History + Favorites</div>
         <div class="feature-text">
-            Image generation mode includes pro controls like framing, lighting, palette, texture, stylize, chaos, and aspect ratio.
+            Keep track of your latest prompts and save the best ones for quick reuse.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -4297,9 +4512,9 @@ with f2:
 with f3:
     st.markdown("""
     <div class="feature-card">
-        <div class="feature-title">📋 One-Click Copy</div>
+        <div class="feature-title">🎨 Pro Image Controls</div>
         <div class="feature-text">
-            Copy the final prompt instantly from the icon at the end of the prompt card.
+            Build much richer image prompts with framing, lighting, mood, palette, stylize, chaos, and negative prompt controls.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -4310,6 +4525,6 @@ with f3:
 st.markdown("""
 <br>
 <div style="text-align:center; color:#94A3B8; font-size:14px; padding-bottom:10px;">
-    Built with ❤️ By GANESH GODDILLA for smarter prompting • <b>PromptNexus AI</b>
+    Built with ❤️ By Ganesh Goddilla for smarter prompting • <b>PromptNexus AI</b>
 </div>
 """, unsafe_allow_html=True)
