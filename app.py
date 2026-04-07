@@ -17,17 +17,18 @@ st.set_page_config(
 # -------------------------------
 # SESSION STATE
 # -------------------------------
-if "generated_prompt" not in st.session_state:
-    st.session_state.generated_prompt = ""
-
-if "history" not in st.session_state:
-    st.session_state.history = []
-
-if "favorites" not in st.session_state:
-    st.session_state.favorites = []
-
-if "last_generation_payload" not in st.session_state:
-    st.session_state.last_generation_payload = None
+defaults = {
+    "generated_prompt": "",
+    "history": [],
+    "favorites": [],
+    "last_generation_payload": None,
+    "topic_value": "",
+    "audience_value": "",
+    "extra_value": "",
+}
+for key, value in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
 
 # -------------------------------
 # CUSTOM CSS
@@ -37,17 +38,14 @@ st.markdown("""
 html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
 }
-
 .stApp {
     background: linear-gradient(135deg, #0B0F19 0%, #111827 40%, #0F172A 100%);
     color: white;
 }
-
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0F172A 0%, #111827 100%);
     border-right: 1px solid rgba(255,255,255,0.08);
 }
-
 .sidebar-logo {
     padding: 14px 10px 18px 10px;
     border-radius: 18px;
@@ -56,7 +54,6 @@ section[data-testid="stSidebar"] {
     box-shadow: 0 0 18px rgba(108,99,255,0.18);
     margin-bottom: 18px;
 }
-
 .logo-title {
     font-size: 28px;
     font-weight: 800;
@@ -65,13 +62,11 @@ section[data-testid="stSidebar"] {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 .logo-subtitle {
     color: #9CA3AF;
     font-size: 13px;
     margin-top: 6px;
 }
-
 .hero-card {
     padding: 28px;
     border-radius: 24px;
@@ -80,7 +75,6 @@ section[data-testid="stSidebar"] {
     box-shadow: 0 0 30px rgba(0,212,255,0.08), 0 0 50px rgba(108,99,255,0.08);
     margin-bottom: 22px;
 }
-
 .hero-title {
     font-size: 42px;
     font-weight: 800;
@@ -89,13 +83,11 @@ section[data-testid="stSidebar"] {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 .hero-desc {
     color: #cbd5e1;
     font-size: 16px;
     line-height: 1.6;
 }
-
 .feature-card {
     background: rgba(17,24,39,0.85);
     border: 1px solid rgba(255,255,255,0.07);
@@ -104,25 +96,21 @@ section[data-testid="stSidebar"] {
     margin-bottom: 16px;
     box-shadow: 0 0 20px rgba(0,0,0,0.18);
 }
-
 .feature-title {
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 10px;
     color: #E5E7EB;
 }
-
 .feature-text {
     color: #9CA3AF;
     line-height: 1.7;
     font-size: 15px;
 }
-
 label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider label {
     color: #E5E7EB !important;
     font-weight: 600 !important;
 }
-
 .stButton > button {
     width: 100%;
     border-radius: 16px;
@@ -135,12 +123,10 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     box-shadow: 0 0 18px rgba(0,212,255,0.25);
     transition: all 0.25s ease-in-out;
 }
-
 .stButton > button:hover {
     transform: translateY(-2px);
     box-shadow: 0 0 24px rgba(108,99,255,0.35);
 }
-
 .stTextArea textarea,
 .stTextInput input {
     background: rgba(17,24,39,0.95) !important;
@@ -148,13 +134,11 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     border-radius: 14px !important;
     border: 1px solid rgba(255,255,255,0.08) !important;
 }
-
 .stSelectbox div[data-baseweb="select"] > div {
     background: rgba(17,24,39,0.95) !important;
     border-radius: 14px !important;
     border: 1px solid rgba(255,255,255,0.08) !important;
 }
-
 .section-title {
     font-size: 26px;
     font-weight: 800;
@@ -162,7 +146,6 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     margin-bottom: 14px;
     color: #F8FAFC;
 }
-
 .badge {
     display: inline-block;
     padding: 6px 12px;
@@ -173,7 +156,6 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     font-size: 13px;
     margin-bottom: 10px;
 }
-
 .example-box {
     background: rgba(17,24,39,0.72);
     border: 1px solid rgba(255,255,255,0.06);
@@ -185,20 +167,12 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     font-size: 14px;
     line-height: 1.7;
 }
-
 .small-note {
     color: #94A3B8;
     font-size: 13px;
     margin-top: -5px;
     margin-bottom: 12px;
 }
-
-.advanced-note {
-    color: #a5b4fc;
-    font-size: 13px;
-    margin-top: 4px;
-}
-
 .prompt-chip {
     display: inline-block;
     padding: 6px 10px;
@@ -209,7 +183,6 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
 }
-
 .history-card {
     background: rgba(17,24,39,0.82);
     border: 1px solid rgba(255,255,255,0.07);
@@ -217,26 +190,22 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     padding: 14px;
     margin-bottom: 12px;
 }
-
 .history-meta {
     color: #94A3B8;
     font-size: 12px;
     margin-bottom: 8px;
 }
-
 .history-title {
     color: #F8FAFC;
     font-weight: 700;
     font-size: 14px;
     margin-bottom: 6px;
 }
-
 .history-text {
     color: #CBD5E1;
     font-size: 13px;
     line-height: 1.6;
 }
-
 .stDownloadButton > button {
     width: 100%;
     border-radius: 16px;
@@ -248,7 +217,6 @@ label, .stSelectbox label, .stTextInput label, .stTextArea label, .stSlider labe
     background: linear-gradient(90deg, #111827, #1F2937);
     border: 1px solid rgba(255,255,255,0.10);
 }
-
 div[data-testid="stExpander"] {
     border-radius: 16px !important;
     border: 1px solid rgba(255,255,255,0.08) !important;
@@ -457,16 +425,11 @@ SHOT_OPTIONS = [
     "low-angle hero shot", "close-up portrait", "wide cinematic shot", "mid-shot composition",
     "full-body character shot", "over-the-shoulder shot", "bird's-eye view", "dynamic action frame"
 ]
-
 LIGHTING_OPTIONS = [
     "dramatic rim lighting", "soft diffused lighting", "golden hour glow", "neon glow",
     "volumetric god rays", "studio lighting", "moonlit ambience", "high contrast cinematic lighting"
 ]
-
-MOOD_OPTIONS = [
-    "epic", "dreamy", "mysterious", "dark fantasy", "heroic", "ethereal", "intense", "calm"
-]
-
+MOOD_OPTIONS = ["epic", "dreamy", "mysterious", "dark fantasy", "heroic", "ethereal", "intense", "calm"]
 PALETTE_OPTIONS = [
     "pastel lavender, baby blue, mint green, peach",
     "deep blue, violet, silver",
@@ -475,22 +438,18 @@ PALETTE_OPTIONS = [
     "warm beige, ivory, bronze",
     "emerald, teal, obsidian"
 ]
-
 CAMERA_OPTIONS = [
     "cinematic lens feel", "85mm portrait feel", "ultra-wide lens perspective",
     "movie poster framing", "editorial fashion framing", "DSLR realism", "anamorphic cinematic framing"
 ]
-
 TEXTURE_OPTIONS = [
     "ultra-detailed metallic textures", "soft fabric detail", "crystalline surfaces",
     "photoreal skin detail", "glossy reflective surfaces", "matte cinematic textures"
 ]
-
 RENDER_OPTIONS = [
     "professional 8k render", "ultra-detailed digital art", "high-end concept art",
     "AAA game art quality", "cinematic movie poster quality", "photorealistic studio render"
 ]
-
 NEGATIVE_DEFAULT = "blurry, low quality, distorted anatomy, extra fingers, cropped, duplicate, watermark, text, logo, oversaturated, noisy background"
 
 # -------------------------------
@@ -513,9 +472,7 @@ def add_to_history(use_case: str, topic: str, prompt: str) -> None:
     st.session_state.history = st.session_state.history[:10]
 
 def add_to_favorites(use_case: str, topic: str, prompt: str) -> None:
-    already_exists = any(
-        fav["prompt"] == prompt for fav in st.session_state.favorites
-    )
+    already_exists = any(fav["prompt"] == prompt for fav in st.session_state.favorites)
     if not already_exists:
         st.session_state.favorites.insert(0, {
             "use_case": use_case,
@@ -555,7 +512,6 @@ def build_image_prompt(
         "Professional": "A premium, polished visual concept of",
         "Expert": "An ultra-refined, masterfully art-directed visual of"
     }
-
     style_suffix_map = {
         "Cinematic": "high-octane cinematic movie poster composition",
         "Anime": "dynamic anime key visual composition",
@@ -626,14 +582,16 @@ def build_final_prompt(use_case, topic, style, audience, extra_details, image_se
             negative_prompt=image_settings["negative_prompt"]
         )
 
+    extra_line = f" Also ensure the output follows these requirements: {extra_details}" if extra_details else ""
+
     if use_case == "Resume / Career":
         return (
             f"Act as an experienced career coach and professional personal branding expert. "
             f"Write a strong, polished, and recruiter-friendly response about {topic} for {audience}. "
             f"{style_instruction} Make the output clear, impactful, and tailored for real hiring scenarios. "
             f"Highlight strengths, value, credibility, and professional positioning. "
-            f"Keep the language natural, confident, and modern while avoiding vague or generic statements. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Keep the language natural, confident, and modern while avoiding vague or generic statements."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Content Writing":
@@ -641,79 +599,79 @@ def build_final_prompt(use_case, topic, style, audience, extra_details, image_se
             f"Act as an expert content writer and strategist. Create high-quality content about {topic} for {audience}. "
             f"{style_instruction} Make the response engaging, well-structured, easy to read, and valuable to the target audience. "
             f"Include a strong opening, smooth flow, relevant details, and a compelling ending. "
-            f"Ensure the writing feels polished, natural, and ready to publish. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Ensure the writing feels polished, natural, and ready to publish."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Coding":
         return (
             f"Act as a senior software engineer and coding assistant. Help with {topic} for {audience}. "
             f"{style_instruction} Provide clean, correct, production-ready output with clear logic, readable structure, and best practices. "
-            f"Include explanations where useful, handle edge cases when relevant, and keep the solution practical and maintainable. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Include explanations where useful, handle edge cases when relevant, and keep the solution practical and maintainable."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Business":
         return (
             f"Act as a strategic business consultant. Create a clear, practical, and insight-driven response about {topic} for {audience}. "
             f"{style_instruction} Focus on business value, execution, realistic strategy, and actionable recommendations. "
-            f"Make the output structured, professional, and useful for decision-making. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Make the output structured, professional, and useful for decision-making."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Students":
         return (
             f"Act as an expert tutor and educational mentor. Explain or create content about {topic} for {audience}. "
             f"{style_instruction} Make the response easy to understand, well-structured, accurate, and educational. "
-            f"Use simple explanations, step-by-step clarity, and examples wherever helpful. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Use simple explanations, step-by-step clarity, and examples wherever helpful."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Marketing":
         return (
             f"Act as an expert marketing strategist and copywriter. Create marketing content for {topic} aimed at {audience}. "
             f"{style_instruction} Focus on audience attention, clarity, persuasion, brand relevance, and conversion potential. "
-            f"Make the output compelling, strategic, and ready for practical campaign use. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Make the output compelling, strategic, and ready for practical campaign use."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Startup Ideas":
         return (
             f"Act as an innovative startup advisor and product strategist. Generate strong ideas and strategic thinking around {topic} for {audience}. "
             f"{style_instruction} Focus on real user pain points, market opportunity, differentiation, monetization, and execution potential. "
-            f"Keep the output practical, high-value, and startup-ready. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Keep the output practical, high-value, and startup-ready."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Social Media":
         return (
             f"Act as a social media strategist and content creator. Create content around {topic} for {audience}. "
             f"{style_instruction} Make the output attention-grabbing, platform-friendly, engaging, and easy to consume. "
-            f"Use strong hooks, clear flow, and content that encourages interaction or retention. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Use strong hooks, clear flow, and content that encourages interaction or retention."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "Email Writing":
         return (
             f"Act as a professional communication expert. Write an effective email about {topic} for {audience}. "
             f"{style_instruction} Make the email clear, polished, purposeful, and appropriate for the situation. "
-            f"Ensure the message has natural wording and a professional tone. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Ensure the message has natural wording and a professional tone."
+            f"{extra_line}"
         ).strip()
 
     if use_case == "YouTube Scripts":
         return (
             f"Act as an expert YouTube scriptwriter. Write a high-retention script about {topic} for {audience}. "
             f"{style_instruction} Start with a strong hook, maintain clear pacing, keep the content engaging, and end with a strong closing or CTA. "
-            f"Make the script natural, audience-focused, and optimized for watch time and clarity. "
-            f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+            f"Make the script natural, audience-focused, and optimized for watch time and clarity."
+            f"{extra_line}"
         ).strip()
 
     return (
         f"Act as an expert assistant. Create a high-quality response about {topic} for {audience}. "
         f"{style_instruction} Make the output clear, useful, polished, and practical. "
-        f"Ensure the final result is easy to understand and directly usable. "
-        f"{('Also ensure the output follows these requirements: ' + extra_details) if extra_details else ''}"
+        f"Ensure the final result is easy to understand and directly usable."
+        f"{extra_line}"
     ).strip()
 
 def render_copyable_prompt(prompt_text: str):
@@ -737,7 +695,6 @@ def render_copyable_prompt(prompt_text: str):
                 font-family: Inter, Arial, sans-serif;
                 color: white;
             }}
-
             .prompt-card {{
                 width: 100%;
                 box-sizing: border-box;
@@ -747,14 +704,12 @@ def render_copyable_prompt(prompt_text: str):
                 padding: 24px;
                 box-shadow: 0 0 25px rgba(0,212,255,0.10), 0 0 35px rgba(168,85,247,0.10);
             }}
-
             .prompt-title {{
                 font-size: 22px;
                 font-weight: 800;
                 color: #ffffff;
                 margin-bottom: 16px;
             }}
-
             .prompt-body {{
                 font-size: 16px;
                 line-height: 1.9;
@@ -764,14 +719,12 @@ def render_copyable_prompt(prompt_text: str):
                 white-space: normal;
                 margin-bottom: 22px;
             }}
-
             .prompt-footer {{
                 display: flex;
                 justify-content: flex-end;
                 align-items: center;
                 gap: 12px;
             }}
-
             .copy-btn {{
                 display: inline-flex;
                 align-items: center;
@@ -786,13 +739,11 @@ def render_copyable_prompt(prompt_text: str):
                 transition: all 0.25s ease;
                 box-shadow: 0 0 12px rgba(0,212,255,0.10);
             }}
-
             .copy-btn:hover {{
                 transform: translateY(-1px);
                 background: rgba(255,255,255,0.08);
                 box-shadow: 0 0 18px rgba(0,212,255,0.22);
             }}
-
             .copy-status {{
                 font-size: 13px;
                 color: #7dd3fc;
@@ -805,7 +756,6 @@ def render_copyable_prompt(prompt_text: str):
             <div class="prompt-card">
                 <div class="prompt-title">🎯 Prompt</div>
                 <div class="prompt-body">{escaped_prompt}</div>
-
                 <div class="prompt-footer">
                     <div id="copy-status" class="copy-status"></div>
                     <button class="copy-btn" onclick="copyPrompt()" title="Copy prompt">
@@ -816,7 +766,6 @@ def render_copyable_prompt(prompt_text: str):
                     </button>
                 </div>
             </div>
-
             <script>
             async function copyPrompt() {{
                 const text = `{js_safe_prompt}`;
@@ -897,7 +846,6 @@ st.markdown("""
 use_case_options = list(USE_CASE_CONFIG.keys())
 
 col1, col2 = st.columns(2)
-
 with col1:
     use_case = st.selectbox("Select Use Case", use_case_options)
 
@@ -912,7 +860,11 @@ with col2:
 col3, col4 = st.columns(2)
 
 with col3:
-    topic = st.text_input("Topic / Goal", placeholder=config["topic_placeholder"], key="topic_input")
+    topic = st.text_input(
+        "Topic / Goal",
+        placeholder=config["topic_placeholder"],
+        key="topic_value"
+    )
     st.markdown(
         f"""
         <div class="example-box">
@@ -926,7 +878,11 @@ with col3:
     )
 
 with col4:
-    audience = st.text_input("Target Audience", placeholder=config["audience_placeholder"], key="audience_input")
+    audience = st.text_input(
+        "Target Audience",
+        placeholder=config["audience_placeholder"],
+        key="audience_value"
+    )
     st.markdown(
         '<div class="small-note">Audience suggestions change based on selected use case.</div>',
         unsafe_allow_html=True
@@ -936,15 +892,14 @@ extra_details = st.text_area(
     "Extra Details / Requirements",
     placeholder=config["extra_placeholder"],
     height=130,
-    key="extra_input"
+    key="extra_value"
 )
 
 # -------------------------------
 # RANDOM PROMPT
 # -------------------------------
 if st.button("🎲 Random Prompt Idea"):
-    random_topic = random.choice(config["random_topics"])
-    st.session_state.topic_input = random_topic
+    st.session_state["topic_value"] = random.choice(config["random_topics"])
     st.rerun()
 
 # -------------------------------
@@ -965,7 +920,6 @@ default_image_settings = {
     "include_negative": True,
     "negative_prompt": NEGATIVE_DEFAULT
 }
-
 image_settings = default_image_settings.copy()
 
 if use_case == "Image Generation":
@@ -973,17 +927,14 @@ if use_case == "Image Generation":
 
     with st.expander("Open pro image controls", expanded=True):
         g1, g2, g3 = st.columns(3)
-
         with g1:
             image_settings["shot_type"] = st.selectbox("Shot / Framing", SHOT_OPTIONS, index=0)
             image_settings["lighting"] = st.selectbox("Lighting", LIGHTING_OPTIONS, index=0)
             image_settings["mood"] = st.selectbox("Mood", MOOD_OPTIONS, index=0)
-
         with g2:
             image_settings["palette"] = st.selectbox("Color Palette", PALETTE_OPTIONS, index=0)
             image_settings["camera"] = st.selectbox("Camera Feel", CAMERA_OPTIONS, index=3)
             image_settings["texture"] = st.selectbox("Texture Detail", TEXTURE_OPTIONS, index=0)
-
         with g3:
             image_settings["render_quality"] = st.selectbox("Render Style", RENDER_OPTIONS, index=0)
             image_settings["aspect_ratio"] = st.selectbox("Aspect Ratio", ["1:1", "2:3", "3:2", "4:5", "9:16", "16:9", "21:9"], index=1)
@@ -1003,23 +954,13 @@ if use_case == "Image Generation":
                 height=90
             )
 
-        st.markdown("""
-        <div class="example-box">
-            <b>What this gives you:</b><br>
-            • direct final prompt instead of prompt instructions<br>
-            • richer visual specificity<br>
-            • cleaner Midjourney-style formatting<br>
-            • stronger cinematic / anime / realistic differentiation
-        </div>
-        """, unsafe_allow_html=True)
-
 # -------------------------------
-# GENERATE FUNCTION
+# GENERATE
 # -------------------------------
 def generate_current_prompt():
-    current_topic = st.session_state.get("topic_input", "").strip()
-    current_audience = st.session_state.get("audience_input", "").strip()
-    current_extra = st.session_state.get("extra_input", "").strip()
+    current_topic = st.session_state.get("topic_value", "").strip()
+    current_audience = st.session_state.get("audience_value", "").strip()
+    current_extra = st.session_state.get("extra_value", "").strip()
 
     if not current_topic:
         st.warning("Please enter a Topic / Goal first.")
@@ -1074,7 +1015,7 @@ with b2:
 with b3:
     if st.button("⭐ Save Favorite"):
         if st.session_state.generated_prompt:
-            current_topic = st.session_state.get("topic_input", "").strip() or "Untitled"
+            current_topic = st.session_state.get("topic_value", "").strip() or "Untitled"
             add_to_favorites(use_case, current_topic, st.session_state.generated_prompt)
             st.success("Added to favorites")
         else:
@@ -1083,6 +1024,9 @@ with b3:
 with b4:
     if st.button("🗑 Clear"):
         st.session_state.generated_prompt = ""
+        st.session_state.topic_value = ""
+        st.session_state.audience_value = ""
+        st.session_state.extra_value = ""
 
 # -------------------------------
 # OUTPUT
@@ -1209,6 +1153,6 @@ with f3:
 st.markdown("""
 <br>
 <div style="text-align:center; color:#94A3B8; font-size:14px; padding-bottom:10px;">
-    Built with ❤️ for smarter prompting • <b>PromptNexus AI</b>
+    Built with ❤️ By GANESH GODDILLA for smarter prompting • <b>PromptNexus AI</b>
 </div>
 """, unsafe_allow_html=True)
