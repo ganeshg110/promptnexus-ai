@@ -1729,7 +1729,7 @@ def logout_user():
     st.session_state.user_email = ""
     st.session_state.user_id = ""
     st.session_state.auth_requested = False
-    st.session_state.auth_code = ""
+    st.session_state.auth_code
     st.session_state.login_notice_sent = False
     st.rerun()
 
@@ -1823,7 +1823,6 @@ def verify_email_otp(email_value: str, otp_code: str):
         st.session_state.user_logged_in = True
         st.session_state.user_email = user_email or email_value
         st.session_state.user_id = user_id or "unknown"
-        st.session_state.auth_code = ""
         st.session_state.auth_requested = False
         st.session_state.login_notice_sent = False
 
